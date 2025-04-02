@@ -14,6 +14,8 @@ import {
 } from "@/components/ui/sidebar";
 import { ActivitySquareIcon, HomeIcon, LayoutGridIcon, PersonStandingIcon, TruckIcon } from "lucide-react";
 import { usePathname } from "next/navigation";
+import logo from '@/public/logo_header.svg';
+import Image from 'next/image';
 
 const data = [
   {
@@ -41,9 +43,12 @@ export function SidebarClient({ show }: { show: boolean }) {
   return (
     <Sidebar>
       <SidebarHeader>
-        <div className="p-4">
-          <h1 className="text-xl font-bold">MyObrasApp</h1>
-        </div>
+      <Image
+                src={logo}
+                alt="Logo Cimentra"
+                height={100}
+                width={200}
+            />
       </SidebarHeader>
 
       <SidebarContent>

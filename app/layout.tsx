@@ -46,7 +46,7 @@ export default function RootLayout({
                 <main className="flex flex-col flex-1 min-h-screen bg-background">
                 <div className="flex-1 flex flex-col">
                 <nav className="w-full border-b border-b-foreground/10 h-16 flex justify-center">
-                  <div className="w-full flex justify-between items-center p-3 px-5 text-sm">
+                  <div className="w-full flex justify-between items-center p-3 px-16 text-sm">
                     <div className="flex gap-5 items-center font-semibold">
                       <ImgLogoHeader />
                     </div>
@@ -54,7 +54,7 @@ export default function RootLayout({
                   </div>
                 </nav>
 
-                <div>
+                <div className="flex-1 flex flex-col gap-4 p-4 px-16">
                   {children}
                 </div>
               </div>
