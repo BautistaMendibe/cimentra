@@ -80,9 +80,9 @@ export default function ProjectForm() {
     }
 
     return (
-        <Card className="max-w-5xl mx-auto">
-            <CardHeader className="flex justify-between">
-                <div >
+        <Card className="max-w-9xl">
+            <CardHeader className="flex flex-row justify-between items-center">
+                <div>
                     <CardTitle className={"text-3xl font-bold"}>Crear Proyecto</CardTitle>
                     <CardDescription>Completá los campos para registrar un nuevo proyecto.</CardDescription>
                 </div>
@@ -91,7 +91,6 @@ export default function ProjectForm() {
                         ← Volver
                     </Button>
                 </div>
-
             </CardHeader>
             <CardContent>
                 <Form {...form}>
@@ -235,7 +234,7 @@ export default function ProjectForm() {
             </CardContent>
             <CardFooter className="flex justify-between border-t pt-6">
                 <Button variant="outline" onClick={() => form.reset()}>
-                    Reiniciar
+                    Reiniciar formulario
                 </Button>
             </CardFooter>
         </Card>
