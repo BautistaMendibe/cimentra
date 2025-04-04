@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { use, useEffect, useState } from "react"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { CalendarIcon } from "lucide-react"
 import { format } from "date-fns"
@@ -18,14 +18,9 @@ import { Switch } from "@/components/ui/switch"
 import { toast } from "sonner"
 import { cn } from "@/lib/utils"
 import {useRouter} from "next/navigation";
+import { supabase  } from "@/lib/supabase";
+import { TypeProject } from "@/models/TypeProject"
 
-const projectTypes = [
-    { id: "residential", name: "Residential" },
-    { id: "commercial", name: "Commercial" },
-    { id: "industrial", name: "Industrial" },
-    { id: "infrastructure", name: "Infrastructure" },
-    { id: "renovation", name: "Renovation" },
-] as const
 
 const formSchema = z.object({
     name: z.string().min(2, {
@@ -47,6 +42,30 @@ const formSchema = z.object({
 export default function ProjectForm() {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const router = useRouter();
+    const [projectTypes, setProjectTypes] = useState<TypeProject[]>([]);
+
+
+    useEffect(() => {
+        getTypesProjects();
+    }, []);
+
+    async function getTypesProjects() {
+        const { data, error } = await supabase.from("tipos_proyecto").select("*");
+
+        if (error) {
+            console.error("Error fetching project types:", error);
+            toast.error("Error al cargar los tipos de proyecto.");
+            return;
+        }
+        
+        const tipos: TypeProject[] = data.map((item: TypeProject) => ({
+            id: item.id,
+            nombre: item.nombre,
+        }));
+
+        setProjectTypes(tipos);
+    }
+
 
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
@@ -58,7 +77,7 @@ export default function ProjectForm() {
             endDate: null,
             activo: true,
         },
-    })
+    });
 
     function onSubmit(values: z.infer<typeof formSchema>) {
         setIsSubmitting(true)
@@ -127,7 +146,7 @@ export default function ProjectForm() {
                                         <SelectContent>
                                             {projectTypes.map((type) => (
                                                 <SelectItem key={type.id} value={type.id}>
-                                                    {type.name}
+                                                    {type.nombre}
                                                 </SelectItem>
                                             ))}
                                         </SelectContent>
