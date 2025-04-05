@@ -18,6 +18,9 @@ export const metadata = {
   metadataBase: new URL(defaultUrl),
   title: "Cimentra - Plataforma de gestion de proyectos y obras", 
   description: "Autmatiza la gestion de tus proyectos y obras con Cimentra",
+  icons: {
+    icon: "/favicon.ico",
+  },
 };
 
 const geistSans = Geist({
