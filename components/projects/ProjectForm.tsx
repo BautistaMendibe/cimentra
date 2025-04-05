@@ -20,6 +20,8 @@ import { cn } from "@/lib/utils"
 import {useRouter} from "next/navigation";
 import { supabase  } from "@/lib/supabase";
 import { TypeProject } from "@/models/TypeProject"
+import Provincia from "@/models/Provincia";
+
 
 
 const formSchema = z.object({
@@ -29,7 +31,13 @@ const formSchema = z.object({
     type: z.string({
         required_error: "Seleccioná un tipo de proyecto.",
     }),
-    ubicacion: z.string().min(2, {
+    provincia: z.string().min(2, {
+        message: "La ubicación es obligatoria.",
+    }),
+    localidad: z.string().min(2, {
+        message: "La ubicación es obligatoria.",
+    }),
+    calle: z.string().min(2, {
         message: "La ubicación es obligatoria.",
     }),
     startDate: z.date({
@@ -43,10 +51,11 @@ export default function ProjectForm() {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const router = useRouter();
     const [projectTypes, setProjectTypes] = useState<TypeProject[]>([]);
-
+    const [provincias, setProvincias] = useState<Provincia[]>([]);
 
     useEffect(() => {
         getTypesProjects();
+        getProvincias()
     }, []);
 
     async function getTypesProjects() {
@@ -66,13 +75,33 @@ export default function ProjectForm() {
         setProjectTypes(tipos);
     }
 
+    async function getProvincias() {
+        const { data, error } = await supabase.from("provincias").select("*");
+
+        if (error) {
+            console.error("Error fetching provincias:", error);
+            toast.error("Error las provincias.");
+            return;
+        }
+        
+        const provincias: Provincia[] = data.map((item: Provincia) => ({
+            id: item.id,
+            nombre: item.nombre,
+            localidades: []
+        }));
+
+        setProvincias(provincias);
+    }
+
 
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
         defaultValues: {
             name: "",
             type: "",
-            ubicacion: "",
+            provincia: "",
+            localidad: "",
+            calle: "",
             startDate: new Date(),
             endDate: null,
             activo: true,
@@ -158,19 +187,7 @@ export default function ProjectForm() {
                         />
 
                         {/* Ubicación */}
-                        <FormField
-                            control={form.control}
-                            name="ubicacion"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>Ubicación</FormLabel>
-                                    <FormControl>
-                                        <Input placeholder="Ej: Córdoba Capital" {...field} />
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
+                        
 
                         {/* Fecha inicio */}
                         <FormField

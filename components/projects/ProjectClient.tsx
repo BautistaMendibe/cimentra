@@ -1,6 +1,6 @@
 'use client'
 
-import { Proyecto } from "@/models/ProjectModel";
+import { Proyecto } from "@/models/Project";
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import { Button } from "../ui/button";

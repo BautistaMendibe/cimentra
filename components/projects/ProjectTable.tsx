@@ -1,6 +1,6 @@
 "use client";
 
-import {Proyecto} from "@/models/ProjectModel";
+import {Proyecto} from "@/models/Project";
 
 type Props = {
     proyectos: Proyecto[];
