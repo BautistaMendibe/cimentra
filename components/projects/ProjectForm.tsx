@@ -2,11 +2,18 @@
 
 import { use, useEffect, useState } from "react"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { CalendarIcon } from "lucide-react"
+import { CalendarIcon, Check, ChevronsUpDown } from "lucide-react"
 import { format } from "date-fns"
 import { useForm } from "react-hook-form"
 import * as z from "zod"
-
+import {
+    Command,
+    CommandEmpty,
+    CommandGroup,
+    CommandInput,
+    CommandItem,
+    CommandList,
+  } from "@/components/ui/command"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Calendar } from "@/components/ui/calendar"
@@ -21,7 +28,6 @@ import {useRouter} from "next/navigation";
 import { supabase  } from "@/lib/supabase";
 import { TypeProject } from "@/models/TypeProject"
 import Provincia from "@/models/Provincia";
-
 
 
 const formSchema = z.object({
@@ -187,6 +193,64 @@ export default function ProjectForm() {
                         />
 
                         {/* Ubicación */}
+                        <FormField
+                            control={form.control}
+                            name="provincia"
+                            render={({ field }) => (
+                                <FormItem className="flex flex-col">
+                                <FormLabel>Ubicación</FormLabel>
+                                <Popover>
+                                    <PopoverTrigger asChild>
+                                    <FormControl>
+                                        <Button
+                                        variant="outline"
+                                        role="combobox"
+                                        className={cn(
+                                            "w-[200px] justify-between",
+                                            !field.value && "text-muted-foreground"
+                                        )}
+                                        >
+                                        {field.value
+                                            ? provincias.find((provincia) => provincia.nombre === field.value)?.nombre
+                                            : "Seleccionar provincia"}
+                                        <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                                        </Button>
+                                    </FormControl>
+                                    </PopoverTrigger>
+                                    <PopoverContent className="w-[200px] p-0">
+                                    <Command>
+                                        <CommandInput placeholder="Buscar provincia..." />
+                                        <CommandList>
+                                        <CommandEmpty>Ninguna provincia encontrada.</CommandEmpty>
+                                        <CommandGroup>
+                                            {provincias.map((provincia) => (
+                                            <CommandItem
+                                                value={provincia.nombre}
+                                                key={provincia.id}
+                                                onSelect={(currentValue) => {
+                                                form.setValue("provincia", currentValue);
+                                                form.setValue("localidad", ""); // Resetea la localidad si cambia la provincia
+                                                }}
+                                            >
+                                                {provincia.nombre}
+                                                <Check
+                                                className={cn(
+                                                    "ml-auto",
+                                                    provincia.nombre === field.value ? "opacity-100" : "opacity-0"
+                                                )}
+                                                />
+                                            </CommandItem>
+                                            ))}
+                                        </CommandGroup>
+                                        </CommandList>
+                                    </Command>
+                                    </PopoverContent>
+                                </Popover>
+                                <FormMessage />
+                                </FormItem>
+                            )}
+                            />
+
                         
 
                         {/* Fecha inicio */}
