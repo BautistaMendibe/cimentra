@@ -224,12 +224,16 @@ export default function ProjectForm() {
                         />
 
                         {/* Ubicación */}
+                        <div className="mt-4">
+                        <FormLabel>Ubicación</FormLabel>
+                        </div>
+                        <div className="flex flex-row gap-4">
+                        {/* Provincia */}
                         <FormField
                             control={form.control}
                             name="provincia"
                             render={({ field }) => (
                                 <FormItem className="flex flex-col">
-                                    <FormLabel>Ubicación</FormLabel>
                                     <Popover>
                                         <PopoverTrigger asChild>
                                             <FormControl>
@@ -289,7 +293,6 @@ export default function ProjectForm() {
                             name="localidad"
                             render={({ field }) => (
                                 <FormItem className="flex flex-col">
-                                    <FormLabel>Localidad</FormLabel>
                                     <Popover>
                                         <PopoverTrigger asChild>
                                             <FormControl>
@@ -345,6 +348,7 @@ export default function ProjectForm() {
 
                         {/* Calle */}
 
+                        </div>                        
 
 
                         {/* Fecha inicio */}
