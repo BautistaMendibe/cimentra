@@ -1,6 +1,6 @@
 "use client"
 
-import { use, useEffect, useState } from "react"
+import { use, useEffect, useMemo, useState } from "react"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { CalendarIcon, Check, ChevronsUpDown } from "lucide-react"
 import { format } from "date-fns"
@@ -13,7 +13,7 @@ import {
     CommandInput,
     CommandItem,
     CommandList,
-  } from "@/components/ui/command"
+} from "@/components/ui/command"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Calendar } from "@/components/ui/calendar"
@@ -24,10 +24,11 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Switch } from "@/components/ui/switch"
 import { toast } from "sonner"
 import { cn } from "@/lib/utils"
-import {useRouter} from "next/navigation";
-import { supabase  } from "@/lib/supabase";
+import { useRouter } from "next/navigation";
+import { supabase } from "@/lib/supabase";
 import { TypeProject } from "@/models/TypeProject"
 import Provincia from "@/models/Provincia";
+import Localidad from "@/models/Localidad"
 
 
 const formSchema = z.object({
@@ -58,6 +59,7 @@ export default function ProjectForm() {
     const router = useRouter();
     const [projectTypes, setProjectTypes] = useState<TypeProject[]>([]);
     const [provincias, setProvincias] = useState<Provincia[]>([]);
+    const [localidades, setLocalidades] = useState<Localidad[]>([]);
 
     useEffect(() => {
         getTypesProjects();
@@ -72,7 +74,7 @@ export default function ProjectForm() {
             toast.error("Error al cargar los tipos de proyecto.");
             return;
         }
-        
+
         const tipos: TypeProject[] = data.map((item: TypeProject) => ({
             id: item.id,
             nombre: item.nombre,
@@ -89,7 +91,7 @@ export default function ProjectForm() {
             toast.error("Error las provincias.");
             return;
         }
-        
+
         const provincias: Provincia[] = data.map((item: Provincia) => ({
             id: item.id,
             nombre: item.nombre,
@@ -113,6 +115,35 @@ export default function ProjectForm() {
             activo: true,
         },
     });
+
+    const provinciaSeleccionada = useMemo(() => {
+        const nombreProvincia = form.watch("provincia");
+        return provincias.find((p) => p.nombre === nombreProvincia);
+      }, [form.watch("provincia"), provincias]);
+
+      useEffect(() => {
+        async function fetchLocalidades() {
+            if (!provinciaSeleccionada) {
+                setLocalidades([]);
+                return;
+            }
+
+            const { data, error } = await supabase
+                .from("localidades")
+                .select("*")
+                .eq("id_provincia", provinciaSeleccionada.id);
+
+            if (error) {
+                console.error("Error al cargar localidades:", error);
+                toast.error("Error al obtener localidades.");
+                return;
+            }
+
+            setLocalidades(data);
+        }
+
+        fetchLocalidades();
+    }, [provinciaSeleccionada]);
 
     function onSubmit(values: z.infer<typeof formSchema>) {
         setIsSubmitting(true)
@@ -198,60 +229,123 @@ export default function ProjectForm() {
                             name="provincia"
                             render={({ field }) => (
                                 <FormItem className="flex flex-col">
-                                <FormLabel>Ubicación</FormLabel>
-                                <Popover>
-                                    <PopoverTrigger asChild>
-                                    <FormControl>
-                                        <Button
-                                        variant="outline"
-                                        role="combobox"
-                                        className={cn(
-                                            "w-[200px] justify-between",
-                                            !field.value && "text-muted-foreground"
-                                        )}
-                                        >
-                                        {field.value
-                                            ? provincias.find((provincia) => provincia.nombre === field.value)?.nombre
-                                            : "Seleccionar provincia"}
-                                        <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                                        </Button>
-                                    </FormControl>
-                                    </PopoverTrigger>
-                                    <PopoverContent className="w-[200px] p-0">
-                                    <Command>
-                                        <CommandInput placeholder="Buscar provincia..." />
-                                        <CommandList>
-                                        <CommandEmpty>Ninguna provincia encontrada.</CommandEmpty>
-                                        <CommandGroup>
-                                            {provincias.map((provincia) => (
-                                            <CommandItem
-                                                value={provincia.nombre}
-                                                key={provincia.id}
-                                                onSelect={(currentValue) => {
-                                                form.setValue("provincia", currentValue);
-                                                form.setValue("localidad", ""); // Resetea la localidad si cambia la provincia
-                                                }}
-                                            >
-                                                {provincia.nombre}
-                                                <Check
-                                                className={cn(
-                                                    "ml-auto",
-                                                    provincia.nombre === field.value ? "opacity-100" : "opacity-0"
-                                                )}
-                                                />
-                                            </CommandItem>
-                                            ))}
-                                        </CommandGroup>
-                                        </CommandList>
-                                    </Command>
-                                    </PopoverContent>
-                                </Popover>
-                                <FormMessage />
+                                    <FormLabel>Ubicación</FormLabel>
+                                    <Popover>
+                                        <PopoverTrigger asChild>
+                                            <FormControl>
+                                                <Button
+                                                    variant="outline"
+                                                    role="combobox"
+                                                    className={cn(
+                                                        "w-[200px] justify-between",
+                                                        !field.value && "text-muted-foreground"
+                                                    )}
+                                                >
+                                                    {field.value
+                                                        ? provincias.find((provincia) => provincia.nombre === field.value)?.nombre
+                                                        : "Seleccionar provincia"}
+                                                    <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                                                </Button>
+                                            </FormControl>
+                                        </PopoverTrigger>
+                                        <PopoverContent className="w-[200px] p-0">
+                                            <Command>
+                                                <CommandInput placeholder="Buscar provincia..." />
+                                                <CommandList>
+                                                    <CommandEmpty>Ninguna provincia encontrada.</CommandEmpty>
+                                                    <CommandGroup>
+                                                        {provincias.map((provincia) => (
+                                                            <CommandItem
+                                                                value={provincia.nombre}
+                                                                key={provincia.id}
+                                                                onSelect={(currentValue) => {
+                                                                    form.setValue("provincia", currentValue);
+                                                                    form.setValue("localidad", ""); // Resetea la localidad si cambia la provincia
+                                                                }}
+                                                            >
+                                                                {provincia.nombre}
+                                                                <Check
+                                                                    className={cn(
+                                                                        "ml-auto",
+                                                                        provincia.nombre === field.value ? "opacity-100" : "opacity-0"
+                                                                    )}
+                                                                />
+                                                            </CommandItem>
+                                                        ))}
+                                                    </CommandGroup>
+                                                </CommandList>
+                                            </Command>
+                                        </PopoverContent>
+                                    </Popover>
+                                    <FormMessage />
                                 </FormItem>
                             )}
-                            />
+                        />
 
-                        
+
+                        {/* Localidad */}
+                        <FormField
+                            control={form.control}
+                            name="localidad"
+                            render={({ field }) => (
+                                <FormItem className="flex flex-col">
+                                    <FormLabel>Localidad</FormLabel>
+                                    <Popover>
+                                        <PopoverTrigger asChild>
+                                            <FormControl>
+                                                <Button
+                                                    variant="outline"
+                                                    role="combobox"
+                                                    className={cn(
+                                                        "w-[200px] justify-between",
+                                                        !field.value && "text-muted-foreground"
+                                                    )}
+                                                    disabled={!provinciaSeleccionada}
+                                                >
+                                                    {field.value
+                                                        ? localidades.find((loc) => loc.nombre === field.value)?.nombre
+                                                        : "Seleccionar localidad"}
+                                                    <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                                                </Button>
+                                            </FormControl>
+                                        </PopoverTrigger>
+                                        <PopoverContent className="w-[200px] p-0">
+                                            <Command>
+                                                <CommandInput placeholder="Buscar localidad..." />
+                                                <CommandList>
+                                                    <CommandEmpty>No se encontraron localidades.</CommandEmpty>
+                                                    <CommandGroup>
+                                                        {localidades.map((localidad) => (
+                                                            <CommandItem
+                                                                value={localidad.nombre}
+                                                                key={localidad.id}
+                                                                onSelect={(currentValue) => {
+                                                                    form.setValue("localidad", currentValue);
+                                                                }}
+                                                            >
+                                                                {localidad.nombre}
+                                                                <Check
+                                                                    className={cn(
+                                                                        "ml-auto",
+                                                                        localidad.nombre === field.value ? "opacity-100" : "opacity-0"
+                                                                    )}
+                                                                />
+                                                            </CommandItem>
+                                                        ))}
+                                                    </CommandGroup>
+                                                </CommandList>
+                                            </Command>
+                                        </PopoverContent>
+                                    </Popover>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+
+
+                        {/* Calle */}
+
+
 
                         {/* Fecha inicio */}
                         <FormField
