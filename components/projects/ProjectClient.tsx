@@ -21,12 +21,14 @@ export default function ProjectsClient ( props: Props ) {
     const [filtroTipo, setFiltroTipo] = useState("");
 
     const proyectosFiltrados = useMemo(() => {
-        return proyectos.filter((proy) => {
-            const matchNombre = proy.nombre.toLowerCase().includes(filtroNombre.toLowerCase());
-            const matchCliente = proy.cliente.toLowerCase().includes(filtroCliente.toLowerCase());
-            const matchTipo = proy.tipo.toLowerCase().includes(filtroTipo.toLowerCase());
-            return matchNombre && matchCliente && matchTipo;
-        });
+        return props.proyectos;
+        
+        //proyectos.filter((proy) => {
+        //    const matchNombre = proy.nombre.toLowerCase().includes(filtroNombre.toLowerCase());
+        //    const matchCliente = proy.cliente.toLowerCase().includes(filtroCliente.toLowerCase());
+        //    const matchTipo = proy.tipo.toLowerCase().includes(filtroTipo.toLowerCase());
+        //    return matchNombre && matchCliente && matchTipo;
+        //});
     }, [filtroNombre, filtroCliente, filtroTipo]);
 
     return (
@@ -69,7 +71,7 @@ export default function ProjectsClient ( props: Props ) {
                 </div>
             </div>
 
-            <ProjectsTable proyectos={proyectosFiltrados} />
+            <ProjectsTable proyectos={proyectos} />
         </div>
     );
 
