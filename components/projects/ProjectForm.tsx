@@ -119,7 +119,7 @@ export default function ProjectForm() {
     const provinciaSeleccionada = useMemo(() => {
         const nombreProvincia = form.watch("provincia");
         return provincias.find((p) => p.nombre === nombreProvincia);
-      }, [form.watch("provincia"), provincias]);
+    }, [form.watch("provincia"), provincias]);
 
     useEffect(() => {
         async function fetchLocalidades() {
@@ -143,7 +143,7 @@ export default function ProjectForm() {
                 id: String(item.id),
                 idProvincia: String(item.id_provincia),
                 nombre: item.nombre
-              }));
+            }));
 
             setLocalidades(dataLocalidades);
         }
@@ -154,27 +154,40 @@ export default function ProjectForm() {
     const localidadSeleccionada = useMemo(() => {
         const nombreLocalidad = form.watch("localidad");
         return localidades.find((l) => l.nombre === nombreLocalidad);
-      }, [form.watch("localidad"), localidades]);
+    }, [form.watch("localidad"), localidades]);
 
-    function onSubmit(values: z.infer<typeof formSchema>) {
-        setIsSubmitting(true)
+    async function onSubmit(values: z.infer<typeof formSchema>) {
+        setIsSubmitting(true);
 
-        const proyectoConFechaCreacion = {
-            ...values,
-            provincia: provinciaSeleccionada?.id,
-            localidad: localidadSeleccionada?.id,
-            fecha_creacion: new Date(),
-            id_presupuesto: null, // temporal
-        }
+        const {
+            data: { user },
+        } = await supabase.auth.getUser();
 
-        setTimeout(() => {
-            console.log("Proyecto creado:", proyectoConFechaCreacion);
+        const { error } = await supabase.from("proyecto").insert([{
+            nombre: values.name,
+            fecha_inicio: values.startDate,
+            fecha_fin: values.endDate,
+            id_tipo: values.type, 
+            id_presupuesto: null, // por ahora null
+            activo: values.activo,
+            created_by: user?.id, // si tenés auth
+            id_provincia: Number(provinciaSeleccionada?.id),
+            id_localidad: Number(localidadSeleccionada?.id),
+            calle: values.calle,
+        }]);
+
+        if (error) {
+            console.error("Error al crear proyecto:", error.details, error.message, error.hint);
+            toast.error("Hubo un error al crear el proyecto.");
+            setIsSubmitting(false);
+        } else {
             toast.success("Proyecto creado", {
                 description: `${values.name} fue creado correctamente.`,
             });
-            form.reset()
-            setIsSubmitting(false)
-        }, 1000)
+            form.reset();
+            setIsSubmitting(false);
+            router.push("/projects"); 
+        }
     }
 
     return (
