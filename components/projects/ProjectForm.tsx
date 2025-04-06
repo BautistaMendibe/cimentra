@@ -347,7 +347,18 @@ export default function ProjectForm() {
 
 
                         {/* Calle */}
-
+                        <FormField
+                            control={form.control}
+                            name="calle"
+                            render={({ field }) => (
+                                <FormItem className="w-full">
+                                    <FormControl>
+                                        <Input placeholder="Calle y número" {...field} />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
                         </div>                        
 
 
