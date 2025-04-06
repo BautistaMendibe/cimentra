@@ -39,13 +39,13 @@ const formSchema = z.object({
         required_error: "Seleccioná un tipo de proyecto.",
     }),
     provincia: z.string().min(2, {
-        message: "La ubicación es obligatoria.",
+        message: "La provincia es obligatoria.",
     }),
     localidad: z.string().min(2, {
-        message: "La ubicación es obligatoria.",
+        message: "La localidad es obligatoria.",
     }),
     calle: z.string().min(2, {
-        message: "La ubicación es obligatoria.",
+        message: "La calle es obligatoria.",
     }),
     startDate: z.date({
         required_error: "Elegí la fecha de inicio.",
@@ -93,7 +93,7 @@ export default function ProjectForm() {
         }
 
         const provincias: Provincia[] = data.map((item: Provincia) => ({
-            id: item.id,
+            id: String(item.id),
             nombre: item.nombre,
             localidades: []
         }));
@@ -121,7 +121,7 @@ export default function ProjectForm() {
         return provincias.find((p) => p.nombre === nombreProvincia);
       }, [form.watch("provincia"), provincias]);
 
-      useEffect(() => {
+    useEffect(() => {
         async function fetchLocalidades() {
             if (!provinciaSeleccionada) {
                 setLocalidades([]);
@@ -139,17 +139,30 @@ export default function ProjectForm() {
                 return;
             }
 
-            setLocalidades(data);
+            const dataLocalidades: Localidad[] = data.map((item: any) => ({
+                id: String(item.id),
+                idProvincia: String(item.id_provincia),
+                nombre: item.nombre
+              }));
+
+            setLocalidades(dataLocalidades);
         }
 
         fetchLocalidades();
     }, [provinciaSeleccionada]);
+
+    const localidadSeleccionada = useMemo(() => {
+        const nombreLocalidad = form.watch("localidad");
+        return localidades.find((l) => l.nombre === nombreLocalidad);
+      }, [form.watch("localidad"), localidades]);
 
     function onSubmit(values: z.infer<typeof formSchema>) {
         setIsSubmitting(true)
 
         const proyectoConFechaCreacion = {
             ...values,
+            provincia: provinciaSeleccionada?.id,
+            localidad: localidadSeleccionada?.id,
             fecha_creacion: new Date(),
             id_presupuesto: null, // temporal
         }
@@ -217,7 +230,7 @@ export default function ProjectForm() {
                                             ))}
                                         </SelectContent>
                                     </Select>
-                                    <FormDescription>Selecciona la categoría que mejor describe este proyecto.</FormDescription>
+                                    <FormDescription>Categoría que mejor describe este proyecto.</FormDescription>
                                     <FormMessage />
                                 </FormItem>
                             )}
@@ -225,141 +238,141 @@ export default function ProjectForm() {
 
                         {/* Ubicación */}
                         <div className="mt-4">
-                        <FormLabel>Ubicación</FormLabel>
+                            <FormLabel>Ubicación</FormLabel>
                         </div>
                         <div className="flex flex-row gap-4">
-                        {/* Provincia */}
-                        <FormField
-                            control={form.control}
-                            name="provincia"
-                            render={({ field }) => (
-                                <FormItem className="flex flex-col">
-                                    <Popover>
-                                        <PopoverTrigger asChild>
-                                            <FormControl>
-                                                <Button
-                                                    variant="outline"
-                                                    role="combobox"
-                                                    className={cn(
-                                                        "w-[200px] justify-between",
-                                                        !field.value && "text-muted-foreground"
-                                                    )}
-                                                >
-                                                    {field.value
-                                                        ? provincias.find((provincia) => provincia.nombre === field.value)?.nombre
-                                                        : "Seleccionar provincia"}
-                                                    <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                                                </Button>
-                                            </FormControl>
-                                        </PopoverTrigger>
-                                        <PopoverContent className="w-[200px] p-0">
-                                            <Command>
-                                                <CommandInput placeholder="Buscar provincia..." />
-                                                <CommandList>
-                                                    <CommandEmpty>Ninguna provincia encontrada.</CommandEmpty>
-                                                    <CommandGroup>
-                                                        {provincias.map((provincia) => (
-                                                            <CommandItem
-                                                                value={provincia.nombre}
-                                                                key={provincia.id}
-                                                                onSelect={(currentValue) => {
-                                                                    form.setValue("provincia", currentValue);
-                                                                    form.setValue("localidad", ""); // Resetea la localidad si cambia la provincia
-                                                                }}
-                                                            >
-                                                                {provincia.nombre}
-                                                                <Check
-                                                                    className={cn(
-                                                                        "ml-auto",
-                                                                        provincia.nombre === field.value ? "opacity-100" : "opacity-0"
-                                                                    )}
-                                                                />
-                                                            </CommandItem>
-                                                        ))}
-                                                    </CommandGroup>
-                                                </CommandList>
-                                            </Command>
-                                        </PopoverContent>
-                                    </Popover>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
+                            {/* Provincia */}
+                            <FormField
+                                control={form.control}
+                                name="provincia"
+                                render={({ field }) => (
+                                    <FormItem className="flex flex-col">
+                                        <Popover>
+                                            <PopoverTrigger asChild>
+                                                <FormControl>
+                                                    <Button
+                                                        variant="outline"
+                                                        role="combobox"
+                                                        className={cn(
+                                                            "w-[200px] justify-between",
+                                                            !field.value && "text-muted-foreground"
+                                                        )}
+                                                    >
+                                                        {field.value
+                                                            ? provincias.find((provincia) => provincia.nombre === field.value)?.nombre
+                                                            : "Seleccionar provincia"}
+                                                        <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                                                    </Button>
+                                                </FormControl>
+                                            </PopoverTrigger>
+                                            <PopoverContent className="w-[200px] p-0">
+                                                <Command>
+                                                    <CommandInput placeholder="Buscar provincia..." />
+                                                    <CommandList>
+                                                        <CommandEmpty>Ninguna provincia encontrada.</CommandEmpty>
+                                                        <CommandGroup>
+                                                            {provincias.map((provincia) => (
+                                                                <CommandItem
+                                                                    value={provincia.nombre}
+                                                                    key={provincia.id}
+                                                                    onSelect={(currentValue) => {
+                                                                        form.setValue("provincia", currentValue);
+                                                                        form.setValue("localidad", ""); // Resetea la localidad si cambia la provincia
+                                                                    }}
+                                                                >
+                                                                    {provincia.nombre}
+                                                                    <Check
+                                                                        className={cn(
+                                                                            "ml-auto",
+                                                                            provincia.nombre === field.value ? "opacity-100" : "opacity-0"
+                                                                        )}
+                                                                    />
+                                                                </CommandItem>
+                                                            ))}
+                                                        </CommandGroup>
+                                                    </CommandList>
+                                                </Command>
+                                            </PopoverContent>
+                                        </Popover>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
 
 
-                        {/* Localidad */}
-                        <FormField
-                            control={form.control}
-                            name="localidad"
-                            render={({ field }) => (
-                                <FormItem className="flex flex-col">
-                                    <Popover>
-                                        <PopoverTrigger asChild>
-                                            <FormControl>
-                                                <Button
-                                                    variant="outline"
-                                                    role="combobox"
-                                                    className={cn(
-                                                        "w-[200px] justify-between",
-                                                        !field.value && "text-muted-foreground"
-                                                    )}
-                                                    disabled={!provinciaSeleccionada}
-                                                >
-                                                    {field.value
-                                                        ? localidades.find((loc) => loc.nombre === field.value)?.nombre
-                                                        : "Seleccionar localidad"}
-                                                    <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                                                </Button>
-                                            </FormControl>
-                                        </PopoverTrigger>
-                                        <PopoverContent className="w-[200px] p-0">
-                                            <Command>
-                                                <CommandInput placeholder="Buscar localidad..." />
-                                                <CommandList>
-                                                    <CommandEmpty>No se encontraron localidades.</CommandEmpty>
-                                                    <CommandGroup>
-                                                        {localidades.map((localidad) => (
-                                                            <CommandItem
-                                                                value={localidad.nombre}
-                                                                key={localidad.id}
-                                                                onSelect={(currentValue) => {
-                                                                    form.setValue("localidad", currentValue);
-                                                                }}
-                                                            >
-                                                                {localidad.nombre}
-                                                                <Check
-                                                                    className={cn(
-                                                                        "ml-auto",
-                                                                        localidad.nombre === field.value ? "opacity-100" : "opacity-0"
-                                                                    )}
-                                                                />
-                                                            </CommandItem>
-                                                        ))}
-                                                    </CommandGroup>
-                                                </CommandList>
-                                            </Command>
-                                        </PopoverContent>
-                                    </Popover>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
+                            {/* Localidad */}
+                            <FormField
+                                control={form.control}
+                                name="localidad"
+                                render={({ field }) => (
+                                    <FormItem className="flex flex-col">
+                                        <Popover>
+                                            <PopoverTrigger asChild>
+                                                <FormControl>
+                                                    <Button
+                                                        variant="outline"
+                                                        role="combobox"
+                                                        className={cn(
+                                                            "w-[200px] justify-between",
+                                                            !field.value && "text-muted-foreground"
+                                                        )}
+                                                        disabled={!provinciaSeleccionada}
+                                                    >
+                                                        {field.value
+                                                            ? localidades.find((loc) => loc.nombre === field.value)?.nombre
+                                                            : "Seleccionar localidad"}
+                                                        <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                                                    </Button>
+                                                </FormControl>
+                                            </PopoverTrigger>
+                                            <PopoverContent className="w-[200px] p-0">
+                                                <Command>
+                                                    <CommandInput placeholder="Buscar localidad..." />
+                                                    <CommandList>
+                                                        <CommandEmpty>No se encontraron localidades.</CommandEmpty>
+                                                        <CommandGroup>
+                                                            {localidades.map((localidad) => (
+                                                                <CommandItem
+                                                                    value={localidad.nombre}
+                                                                    key={localidad.id}
+                                                                    onSelect={(currentValue) => {
+                                                                        form.setValue("localidad", currentValue);
+                                                                    }}
+                                                                >
+                                                                    {localidad.nombre}
+                                                                    <Check
+                                                                        className={cn(
+                                                                            "ml-auto",
+                                                                            localidad.nombre === field.value ? "opacity-100" : "opacity-0"
+                                                                        )}
+                                                                    />
+                                                                </CommandItem>
+                                                            ))}
+                                                        </CommandGroup>
+                                                    </CommandList>
+                                                </Command>
+                                            </PopoverContent>
+                                        </Popover>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
 
 
-                        {/* Calle */}
-                        <FormField
-                            control={form.control}
-                            name="calle"
-                            render={({ field }) => (
-                                <FormItem className="w-full">
-                                    <FormControl>
-                                        <Input placeholder="Calle y número" {...field} />
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-                        </div>                        
+                            {/* Calle */}
+                            <FormField
+                                control={form.control}
+                                name="calle"
+                                render={({ field }) => (
+                                    <FormItem className="w-full">
+                                        <FormControl>
+                                            <Input placeholder="Calle y número" {...field} />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                        </div>
 
 
                         {/* Fecha inicio */}
