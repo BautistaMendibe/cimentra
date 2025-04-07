@@ -21,7 +21,7 @@ export default async function AuthButton() {
 
       {/* Derecha - email, logout, theme */}
       <div className="flex items-center gap-4">
-        <span className="text-sm">Hey, {user.email}!</span>
+        <span className="text-sm hidden sm:inline">Hey, {user.email}!</span>
         <form action={signOutAction}>
           <Button type="submit" variant="outline">
             Sign out
@@ -30,9 +30,7 @@ export default async function AuthButton() {
         <ThemeSwitcher />
       </div>
     </div>
-
-
-
+    
   ) : (
     <div className="flex gap-2">
       <Button asChild size="sm" variant={"outline"}>
