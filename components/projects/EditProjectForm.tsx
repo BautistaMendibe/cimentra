@@ -116,7 +116,7 @@ export default function EditProjectForm() {
                 nombre: values.name,
                 fecha_inicio: values.startDate,
                 fecha_fin: values.endDate,
-                id_tipo: Number(values.type),
+                id_tipo: values.type,
                 activo: values.activo,
                 id_provincia: Number(provinciaSeleccionada?.id),
                 id_localidad: Number(localidadSeleccionada?.id),
