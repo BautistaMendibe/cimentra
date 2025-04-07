@@ -1,12 +1,17 @@
 "use client";
 
 import { Proyecto } from "@/models/Project";
+import { useRouter } from "next/navigation";
+import { Button } from "../ui/button";
 
 type Props = {
   proyectos: Proyecto[];
 };
 
 export default function ProjectsTable({ proyectos }: Props) {
+
+  const router = useRouter();
+
   if (proyectos.length === 0) {
     return <div className="p-6 text-center text-gray-500">No hay resultados.</div>;
   }
@@ -26,12 +31,13 @@ export default function ProjectsTable({ proyectos }: Props) {
               <th>Provincia</th>
               <th>Localidad</th>
               <th>Calle</th>
+              <th></th>
               {/* Solo mostrar si esta inactivo con un hover de otro color en la celda, no esta todavia */}
             </tr>
           </thead>
           <tbody>
             {proyectos.map((proyecto: Proyecto) => (
-              <tr key={proyecto.id} className="border-b hover:bg-gray-50">
+              <tr key={proyecto.id} className="border-b hover:bg-gray-50 cursor-pointer" onClick={() => router.push(`/projects/${proyecto.id}`)}>
                 <td className="p-4 font-medium">{proyecto.nombre}</td>
                 <td>
                   <span className="mr-1">{proyecto.icono_tipo}</span>
@@ -44,6 +50,18 @@ export default function ProjectsTable({ proyectos }: Props) {
                 <td>{proyecto.localidad}</td>
                 <td>{proyecto.calle}</td>
                 {/* Solo mostrar si esta inactivo con un hover de otro color en la celda, no esta todavia*/}
+                <td>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={(e) => {
+                      e.stopPropagation(); // evita que dispare el click de la fila
+                      router.push(`/projects/${proyecto.id}`);
+                    }}
+                  >
+                    Ver
+                  </Button>
+                </td>
               </tr>
             ))}
           </tbody>
@@ -113,9 +131,8 @@ export default function ProjectsTable({ proyectos }: Props) {
 function EstadoTag({ activo }: { activo: boolean }) {
   return (
     <span
-      className={`text-xs px-2 py-0.5 rounded-full ${
-        activo ? "bg-black text-white" : "bg-gray-200 text-gray-700"
-      }`}
+      className={`text-xs px-2 py-0.5 rounded-full ${activo ? "bg-black text-white" : "bg-gray-200 text-gray-700"
+        }`}
     >
       {activo ? "Activo" : "Inactivo"}
     </span>
