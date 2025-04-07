@@ -29,6 +29,8 @@ import { supabase } from "@/lib/supabase";
 import { TypeProject } from "@/models/TypeProject"
 import Provincia from "@/models/Provincia";
 import Localidad from "@/models/Localidad"
+import * as LucideIcons from "lucide-react";
+
 
 
 const formSchema = z.object({
@@ -78,6 +80,7 @@ export default function ProjectForm() {
         const tipos: TypeProject[] = data.map((item: TypeProject) => ({
             id: item.id,
             nombre: item.nombre,
+            icono: item.icono,
         }));
 
         setProjectTypes(tipos);
@@ -167,7 +170,7 @@ export default function ProjectForm() {
             nombre: values.name,
             fecha_inicio: values.startDate,
             fecha_fin: values.endDate,
-            id_tipo: values.type, 
+            id_tipo: values.type,
             id_presupuesto: null, // por ahora null
             activo: values.activo,
             created_by: user?.id, // si tenés auth
@@ -186,7 +189,7 @@ export default function ProjectForm() {
             });
             form.reset();
             setIsSubmitting(false);
-            router.push("/projects"); 
+            router.push("/projects");
         }
     }
 
@@ -236,11 +239,18 @@ export default function ProjectForm() {
                                             </SelectTrigger>
                                         </FormControl>
                                         <SelectContent>
-                                            {projectTypes.map((type) => (
-                                                <SelectItem key={type.id} value={type.id}>
-                                                    {type.nombre}
-                                                </SelectItem>
-                                            ))}
+                                            {projectTypes.map((type) => {
+                                                const Icon = LucideIcons[type.icono as keyof typeof LucideIcons] as React.FC<{ className?: string }>;
+
+                                                return (
+                                                    <SelectItem key={type.id} value={type.id}>
+                                                        <div className="flex items-center gap-2">
+                                                            {Icon && <Icon className="h-4 w-4" />}
+                                                            {type.nombre}
+                                                        </div>
+                                                    </SelectItem>
+                                                );
+                                            })}
                                         </SelectContent>
                                     </Select>
                                     <FormDescription>Categoría que mejor describe este proyecto.</FormDescription>
