@@ -59,10 +59,21 @@ export default function ProjectDetails() {
 
   return (
     <Card className="w-full max-w-5xl mx-auto mt-4">
-      <CardHeader className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <div>
-          <CardTitle className="text-3xl font-bold">{proyecto.nombre}</CardTitle>
-          <CardDescription>Detalle completo del proyecto seleccionado</CardDescription>
+      <CardHeader className="flex flex-col gap-2 sm:flex-row sm:justify-between sm:items-center">
+        <div className="flex flex-col gap-1">
+          <div>
+            <span
+              className={`text-xs px-2 py-1 rounded-full w-fit ${
+                proyecto.activo ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"
+              }`}
+            >
+              {proyecto.activo ? "Proyecto activo" : "Proyecto inactivo"}
+            </span>
+          </div>
+          <div>
+            <CardTitle className="text-3xl font-bold mt-2">{proyecto.nombre}</CardTitle>
+            <CardDescription>Detalle completo del proyecto</CardDescription>
+          </div>
         </div>
         <Button variant="outline" size="sm" onClick={() => router.back()}>
           ← Volver
@@ -72,7 +83,7 @@ export default function ProjectDetails() {
       <CardContent className="space-y-6 text-sm">
         {/* Grupo: Tipo y Estado */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div className="rounded-md bg-muted p-4">
+          <div className="rounded-md bg-gray-50 p-4 border">
             <p className="text-muted-foreground text-xs mb-1">Tipo de proyecto</p>
             <p className="font-medium flex items-center gap-1">
               <span>{proyecto.icono_tipo}</span>
@@ -80,7 +91,7 @@ export default function ProjectDetails() {
             </p>
           </div>
 
-          <div className="rounded-md bg-muted p-4">
+          <div className="rounded-md bg-gray-50 p-4 border">
             <p className="text-muted-foreground text-xs mb-1">Estado</p>
             <span className={`px-2 py-0.5 rounded-full text-xs ${proyecto.color_estado}`}>
               {proyecto.estado}
@@ -90,19 +101,19 @@ export default function ProjectDetails() {
 
         {/* Grupo: Fechas */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div className="rounded-md bg-muted p-4">
+          <div className="rounded-md bg-gray-50 p-4 border">
             <p className="text-muted-foreground text-xs mb-1">Fecha de inicio</p>
             <p>{formatearFecha(proyecto.fecha_inicio)}</p>
           </div>
 
-          <div className="rounded-md bg-muted p-4">
+          <div className="rounded-md bg-gray-50 p-4 border">
             <p className="text-muted-foreground text-xs mb-1">Fecha de finalización</p>
             <p>{proyecto.fecha_fin ? formatearFecha(proyecto.fecha_fin) : "-"}</p>
           </div>
         </div>
 
         {/* Grupo: Ubicación */}
-        <div className="rounded-md bg-muted p-4">
+        <div className="rounded-md bg-gray-50 p-4 border">
           <p className="text-muted-foreground text-xs mb-1">Ubicación</p>
           <p>{`${proyecto.calle}, ${proyecto.localidad}, ${proyecto.provincia}`}</p>
         </div>
