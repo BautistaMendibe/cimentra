@@ -8,6 +8,17 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Loader2 } from "lucide-react";
 import { Proyecto } from "@/models/Project";
 import { toast } from "sonner";
+import {
+  AlertDialog,
+  AlertDialogTrigger,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogCancel,
+  AlertDialogAction,
+} from "@/components/ui/alert-dialog"
 
 export default function ProjectDetails() {
   const { id } = useParams();
@@ -79,14 +90,25 @@ export default function ProjectDetails() {
           <Button variant="outline" size="sm" onClick={() => router.back()}>
             ← Volver
           </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={handleDelete}
-            title="Eliminar proyecto"
-          >
-            🗑️
-          </Button>
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <Button variant="outline" size="sm" title="Eliminar proyecto">
+                🗑️
+              </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>¿Eliminar este proyecto?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  Esta acción no se puede deshacer. Se eliminará el proyecto permanentemente de la base de datos.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                <AlertDialogAction onClick={handleDelete}>Sí, eliminar</AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
         </div>
       </CardHeader>
 
@@ -132,10 +154,6 @@ export default function ProjectDetails() {
   );
 
   async function handleDelete() {
-    const confirmDelete = window.confirm("¿Estás seguro de que querés eliminar este proyecto?");
-
-    if (!confirmDelete) return;
-
     const { error } = await supabase.from("proyecto").delete().eq("id", id);
 
     if (error) {
