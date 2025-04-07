@@ -1,509 +1,201 @@
-"use client"
+"use client";
 
-import { use, useEffect, useMemo, useState } from "react"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { CalendarIcon, Check, ChevronsUpDown } from "lucide-react"
-import { format } from "date-fns"
-import { useForm } from "react-hook-form"
-import * as z from "zod"
-import {
-    Command,
-    CommandEmpty,
-    CommandGroup,
-    CommandInput,
-    CommandItem,
-    CommandList,
-} from "@/components/ui/command"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Calendar } from "@/components/ui/calendar"
-import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
-import { Input } from "@/components/ui/input"
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Switch } from "@/components/ui/switch"
-import { toast } from "sonner"
-import { cn } from "@/lib/utils"
+import { useEffect, useMemo, useState } from "react";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";
+import * as z from "zod";
+import { toast } from "sonner";
+
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardFooter, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Form } from "@/components/ui/form";
 import { supabase } from "@/lib/supabase";
-import { TypeProject } from "@/models/TypeProject"
 import Provincia from "@/models/Provincia";
-import Localidad from "@/models/Localidad"
-
-
+import Localidad from "@/models/Localidad";
+import { TypeProject } from "@/models/TypeProject";
+import ProjectFormFields from "./ProjectFormFields";
 
 const formSchema = z.object({
-    name: z.string().min(2, {
-        message: "El nombre debe tener al menos 2 caracteres.",
-    }),
-    type: z.string({
-        required_error: "Seleccioná un tipo de proyecto.",
-    }),
-    provincia: z.string().min(2, {
-        message: "La provincia es obligatoria.",
-    }),
-    localidad: z.string().min(2, {
-        message: "La localidad es obligatoria.",
-    }),
-    calle: z.string().min(2, {
-        message: "La calle es obligatoria.",
-    }),
-    startDate: z.date({
-        required_error: "Elegí la fecha de inicio.",
-    }),
-    endDate: z.date().nullable(),
-    activo: z.boolean(),
-})
+  name: z.string().min(2, {
+    message: "El nombre debe tener al menos 2 caracteres.",
+  }),
+  type: z.string({
+    required_error: "Seleccioná un tipo de proyecto.",
+  }),
+  provincia: z.string().min(2, {
+    message: "La provincia es obligatoria.",
+  }),
+  localidad: z.string().min(2, {
+    message: "La localidad es obligatoria.",
+  }),
+  calle: z.string().min(2, {
+    message: "La calle es obligatoria.",
+  }),
+  startDate: z.date({
+    required_error: "Elegí la fecha de inicio.",
+  }),
+  endDate: z.date().nullable(),
+  activo: z.boolean(),
+});
 
 export default function ProjectForm() {
-    const [isSubmitting, setIsSubmitting] = useState(false);
-    const router = useRouter();
-    const [projectTypes, setProjectTypes] = useState<TypeProject[]>([]);
-    const [provincias, setProvincias] = useState<Provincia[]>([]);
-    const [localidades, setLocalidades] = useState<Localidad[]>([]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const router = useRouter();
+  const [projectTypes, setProjectTypes] = useState<TypeProject[]>([]);
+  const [provincias, setProvincias] = useState<Provincia[]>([]);
+  const [localidades, setLocalidades] = useState<Localidad[]>([]);
 
-    useEffect(() => {
-        getTypesProjects();
-        getProvincias()
-    }, []);
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      name: "",
+      type: "",
+      provincia: "",
+      localidad: "",
+      calle: "",
+      startDate: new Date(),
+      endDate: null,
+      activo: true,
+    },
+  });
 
-    async function getTypesProjects() {
-        const { data, error } = await supabase.from("tipos_proyecto").select("*");
+  const provinciaSeleccionada = useMemo(() => {
+    const nombreProvincia = form.watch("provincia");
+    return provincias.find((p) => p.nombre === nombreProvincia);
+  }, [form.watch("provincia"), provincias]);
 
-        if (error) {
-            console.error("Error fetching project types:", error);
-            toast.error("Error al cargar los tipos de proyecto.");
-            return;
-        }
+  const localidadSeleccionada = useMemo(() => {
+    const nombreLocalidad = form.watch("localidad");
+    return localidades.find((l) => l.nombre === nombreLocalidad);
+  }, [form.watch("localidad"), localidades]);
 
-        const tipos: TypeProject[] = data.map((item: TypeProject) => ({
-            id: item.id,
-            nombre: item.nombre,
-            icono: item.icono,
-        }));
+  useEffect(() => {
+    getTypesProjects();
+    getProvincias();
+  }, []);
 
-        setProjectTypes(tipos);
+  useEffect(() => {
+    if (provinciaSeleccionada) {
+      fetchLocalidades(provinciaSeleccionada.id);
     }
+  }, [provinciaSeleccionada]);
 
-    async function getProvincias() {
-        const { data, error } = await supabase.from("provincias").select("*");
-
-        if (error) {
-            console.error("Error fetching provincias:", error);
-            toast.error("Error las provincias.");
-            return;
-        }
-
-        const provincias: Provincia[] = data.map((item: Provincia) => ({
-            id: String(item.id),
-            nombre: item.nombre,
-            localidades: []
-        }));
-
-        setProvincias(provincias);
+  async function getTypesProjects() {
+    const { data, error } = await supabase.from("tipos_proyecto").select("*");
+    if (!error && data) {
+      const tipos: TypeProject[] = data.map((item: TypeProject) => ({
+        id: item.id,
+        nombre: item.nombre,
+        icono: item.icono,
+      }));
+      setProjectTypes(tipos);
+    } else {
+      toast.error("Error al cargar los tipos de proyecto.");
     }
+  }
 
-
-    const form = useForm<z.infer<typeof formSchema>>({
-        resolver: zodResolver(formSchema),
-        defaultValues: {
-            name: "",
-            type: "",
-            provincia: "",
-            localidad: "",
-            calle: "",
-            startDate: new Date(),
-            endDate: null,
-            activo: true,
-        },
-    });
-
-    const provinciaSeleccionada = useMemo(() => {
-        const nombreProvincia = form.watch("provincia");
-        return provincias.find((p) => p.nombre === nombreProvincia);
-    }, [form.watch("provincia"), provincias]);
-
-    useEffect(() => {
-        async function fetchLocalidades() {
-            if (!provinciaSeleccionada) {
-                setLocalidades([]);
-                return;
-            }
-
-            const { data, error } = await supabase
-                .from("localidades")
-                .select("*")
-                .eq("id_provincia", provinciaSeleccionada.id);
-
-            if (error) {
-                console.error("Error al cargar localidades:", error);
-                toast.error("Error al obtener localidades.");
-                return;
-            }
-
-            const dataLocalidades: Localidad[] = data.map((item: any) => ({
-                id: String(item.id),
-                idProvincia: String(item.id_provincia),
-                nombre: item.nombre
-            }));
-
-            setLocalidades(dataLocalidades);
-        }
-
-        fetchLocalidades();
-    }, [provinciaSeleccionada]);
-
-    const localidadSeleccionada = useMemo(() => {
-        const nombreLocalidad = form.watch("localidad");
-        return localidades.find((l) => l.nombre === nombreLocalidad);
-    }, [form.watch("localidad"), localidades]);
-
-    async function onSubmit(values: z.infer<typeof formSchema>) {
-        setIsSubmitting(true);
-
-        const {
-            data: { user },
-        } = await supabase.auth.getUser();
-
-        const { error } = await supabase.from("proyecto").insert([{
-            nombre: values.name,
-            fecha_inicio: values.startDate,
-            fecha_fin: values.endDate,
-            id_tipo: values.type,
-            id_presupuesto: null, // por ahora null
-            activo: values.activo,
-            created_by: user?.id, // si tenés auth
-            id_provincia: Number(provinciaSeleccionada?.id),
-            id_localidad: Number(localidadSeleccionada?.id),
-            calle: values.calle,
-        }]);
-
-        if (error) {
-            console.error("Error al crear proyecto:", error.details, error.message, error.hint);
-            toast.error("Hubo un error al crear el proyecto.");
-            setIsSubmitting(false);
-        } else {
-            toast.success("Proyecto creado", {
-                description: `${values.name} fue creado correctamente.`,
-            });
-            form.reset();
-            setIsSubmitting(false);
-            router.push("/projects");
-        }
+  async function getProvincias() {
+    const { data, error } = await supabase.from("provincias").select("*");
+    if (!error && data) {
+      const provincias: Provincia[] = data.map((item: Provincia) => ({
+        id: String(item.id),
+        nombre: item.nombre,
+        localidades: [],
+      }));
+      setProvincias(provincias);
+    } else {
+      toast.error("Error al cargar las provincias.");
     }
+  }
 
-    return (
-        <Card className="w-full max-w-4xl mx-auto mt-2">
-            <CardHeader className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-                <div>
-                    <CardTitle className="text-3xl font-bold sm:w-auto">🚧 Crear Proyecto</CardTitle>
-                    <CardDescription>
-                        Completá los campos para registrar un nuevo proyecto.
-                    </CardDescription>
-                </div>
-                <Button variant="outline" size="sm" onClick={() => router.back()}>
-                    ← Volver
-                </Button>
-            </CardHeader>
+  async function fetchLocalidades(idProvincia: string) {
+    const { data, error } = await supabase
+      .from("localidades")
+      .select("*")
+      .eq("id_provincia", idProvincia);
 
-            <CardContent>
-                <Form {...form}>
-                    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-                        {/* Nombre */}
-                        <FormField
-                            control={form.control}
-                            name="name"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>Nombre del Proyecto</FormLabel>
-                                    <FormControl>
-                                        <Input placeholder="Ej: Edificio Belgrano" {...field} />
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
+    if (!error && data) {
+      const locs: Localidad[] = data.map((item: any) => ({
+        id: String(item.id),
+        idProvincia: String(item.id_provincia),
+        nombre: item.nombre,
+      }));
+      setLocalidades(locs);
+    }
+  }
 
-                        {/* Tipo */}
-                        <FormField
-                            control={form.control}
-                            name="type"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>Tipo de Proyecto</FormLabel>
-                                    <Select onValueChange={field.onChange} defaultValue={field.value}>
-                                        <FormControl>
-                                            <SelectTrigger>
-                                                <SelectValue placeholder="Seleccioná un tipo" />
-                                            </SelectTrigger>
-                                        </FormControl>
-                                        <SelectContent>
-                                            {projectTypes.map((type) => (
-                                                <SelectItem key={type.id} value={type.id}>
-                                                    <div className="flex items-center gap-2">
-                                                        {type.icono && <span className="text-lg">{type.icono}</span>}
-                                                        {type.nombre}
-                                                    </div>
-                                                </SelectItem>
-                                            ))}
-                                        </SelectContent>
-                                    </Select>
-                                    <FormDescription>
-                                        Categoría que mejor describe este proyecto.
-                                    </FormDescription>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    setIsSubmitting(true);
 
-                        {/* Ubicación */}
-                        <div>
-                            <FormLabel>Ubicación</FormLabel>
-                        </div>
-                        <div className="flex flex-col md:flex-row gap-4">
-                            {/* Provincia */}
-                            <FormField
-                                control={form.control}
-                                name="provincia"
-                                render={({ field }) => (
-                                    <FormItem className="w-full md:w-[200px]">
-                                        <Popover>
-                                            <PopoverTrigger asChild>
-                                                <FormControl>
-                                                    <Button
-                                                        variant="outline"
-                                                        role="combobox"
-                                                        className={cn(
-                                                            "w-full justify-between",
-                                                            !field.value && "text-muted-foreground"
-                                                        )}
-                                                    >
-                                                        {field.value
-                                                            ? provincias.find((prov) => prov.nombre === field.value)?.nombre
-                                                            : "Seleccionar provincia"}
-                                                        <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                                                    </Button>
-                                                </FormControl>
-                                            </PopoverTrigger>
-                                            <PopoverContent className="w-full p-0">
-                                                <Command>
-                                                    <CommandInput placeholder="Buscar provincia..." />
-                                                    <CommandList>
-                                                        <CommandEmpty>No se encontraron provincias.</CommandEmpty>
-                                                        <CommandGroup>
-                                                            {provincias.map((provincia) => (
-                                                                <CommandItem
-                                                                    key={provincia.id}
-                                                                    value={provincia.nombre}
-                                                                    onSelect={(val) => {
-                                                                        form.setValue("provincia", val);
-                                                                        form.setValue("localidad", "");
-                                                                    }}
-                                                                >
-                                                                    {provincia.nombre}
-                                                                    <Check
-                                                                        className={cn(
-                                                                            "ml-auto",
-                                                                            provincia.nombre === field.value ? "opacity-100" : "opacity-0"
-                                                                        )}
-                                                                    />
-                                                                </CommandItem>
-                                                            ))}
-                                                        </CommandGroup>
-                                                    </CommandList>
-                                                </Command>
-                                            </PopoverContent>
-                                        </Popover>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
 
-                            {/* Localidad */}
-                            <FormField
-                                control={form.control}
-                                name="localidad"
-                                render={({ field }) => (
-                                    <FormItem className="w-full md:w-[200px]">
-                                        <Popover>
-                                            <PopoverTrigger asChild>
-                                                <FormControl>
-                                                    <Button
-                                                        variant="outline"
-                                                        role="combobox"
-                                                        className={cn(
-                                                            "w-full justify-between",
-                                                            !field.value && "text-muted-foreground"
-                                                        )}
-                                                        disabled={!provinciaSeleccionada}
-                                                    >
-                                                        {field.value
-                                                            ? localidades.find((loc) => loc.nombre === field.value)?.nombre
-                                                            : "Seleccionar localidad"}
-                                                        <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                                                    </Button>
-                                                </FormControl>
-                                            </PopoverTrigger>
-                                            <PopoverContent className="w-full p-0">
-                                                <Command>
-                                                    <CommandInput placeholder="Buscar localidad..." />
-                                                    <CommandList>
-                                                        <CommandEmpty>No se encontraron localidades.</CommandEmpty>
-                                                        <CommandGroup>
-                                                            {localidades.map((localidad) => (
-                                                                <CommandItem
-                                                                    key={localidad.id}
-                                                                    value={localidad.nombre}
-                                                                    onSelect={(val) => form.setValue("localidad", val)}
-                                                                >
-                                                                    {localidad.nombre}
-                                                                    <Check
-                                                                        className={cn(
-                                                                            "ml-auto",
-                                                                            localidad.nombre === field.value ? "opacity-100" : "opacity-0"
-                                                                        )}
-                                                                    />
-                                                                </CommandItem>
-                                                            ))}
-                                                        </CommandGroup>
-                                                    </CommandList>
-                                                </Command>
-                                            </PopoverContent>
-                                        </Popover>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
+    const { error } = await supabase.from("proyecto").insert([
+      {
+        nombre: values.name,
+        fecha_inicio: values.startDate,
+        fecha_fin: values.endDate,
+        id_tipo: values.type,
+        id_presupuesto: null,
+        activo: values.activo,
+        created_by: user?.id,
+        id_provincia: Number(provinciaSeleccionada?.id),
+        id_localidad: Number(localidadSeleccionada?.id),
+        calle: values.calle,
+      },
+    ]);
 
-                            {/* Calle */}
-                            <FormField
-                                control={form.control}
-                                name="calle"
-                                render={({ field }) => (
-                                    <FormItem className="w-full">
-                                        <FormControl>
-                                            <Input placeholder="Calle y número" {...field} />
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-                        </div>
+    if (error) {
+      toast.error("Hubo un error al crear el proyecto.");
+      setIsSubmitting(false);
+    } else {
+      toast.success("Proyecto creado", {
+        description: `${values.name} fue creado correctamente.`,
+      });
+      form.reset();
+      setIsSubmitting(false);
+      router.push("/projects");
+    }
+  }
 
-                        {/* Fechas */}
-                        <div className="flex flex-col md:flex-row gap-4">
-                            {/* Fecha inicio */}
-                            <FormField
-                                control={form.control}
-                                name="startDate"
-                                render={({ field }) => (
-                                    <FormItem className="w-full">
-                                        <FormLabel>Fecha de Inicio</FormLabel>
-                                        <Popover>
-                                            <PopoverTrigger asChild>
-                                                <FormControl>
-                                                    <Button
-                                                        variant="outline"
-                                                        className={cn(
-                                                            "w-full pl-3 text-left font-normal",
-                                                            !field.value && "text-muted-foreground"
-                                                        )}
-                                                    >
-                                                        {field.value
-                                                            ? format(field.value, "PPP")
-                                                            : "Seleccioná una fecha"}
-                                                        <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                                                    </Button>
-                                                </FormControl>
-                                            </PopoverTrigger>
-                                            <PopoverContent className="w-auto p-0" align="start">
-                                                <Calendar
-                                                    mode="single"
-                                                    selected={field.value}
-                                                    onSelect={field.onChange}
-                                                    initialFocus
-                                                />
-                                            </PopoverContent>
-                                        </Popover>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
+  return (
+    <Card className="w-full max-w-4xl mx-auto mt-2">
+      <CardHeader className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div>
+          <CardTitle className="text-3xl font-bold sm:w-auto">🚧 Crear Proyecto</CardTitle>
+          <CardDescription>
+            Completá los campos para registrar un nuevo proyecto.
+          </CardDescription>
+        </div>
+        <Button variant="outline" size="sm" onClick={() => router.back()}>
+          ← Volver
+        </Button>
+      </CardHeader>
 
-                            {/* Fecha fin */}
-                            <FormField
-                                control={form.control}
-                                name="endDate"
-                                render={({ field }) => (
-                                    <FormItem className="w-full">
-                                        <FormLabel>Fecha de Finalización</FormLabel>
-                                        <Popover>
-                                            <PopoverTrigger asChild>
-                                                <FormControl>
-                                                    <Button
-                                                        variant="outline"
-                                                        className={cn(
-                                                            "w-full pl-3 text-left font-normal",
-                                                            !field.value && "text-muted-foreground"
-                                                        )}
-                                                    >
-                                                        {field.value
-                                                            ? format(field.value, "PPP")
-                                                            : "Seleccioná una fecha"}
-                                                        <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                                                    </Button>
-                                                </FormControl>
-                                            </PopoverTrigger>
-                                            <PopoverContent className="w-auto p-0" align="start">
-                                                <Calendar
-                                                    mode="single"
-                                                    selected={field.value ?? undefined}
-                                                    onSelect={field.onChange}
-                                                    initialFocus
-                                                />
-                                            </PopoverContent>
-                                        </Popover>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-                        </div>
+      <CardContent>
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+            <ProjectFormFields
+              form={form}
+              provincias={provincias}
+              localidades={localidades}
+              projectTypes={projectTypes}
+            />
 
-                        {/* Activo */}
-                        <FormField
-                            control={form.control}
-                            name="activo"
-                            render={({ field }) => (
-                                <FormItem className="flex items-center justify-between rounded-lg border p-4">
-                                    <div className="space-y-0.5">
-                                        <FormLabel>¿Proyecto Activo?</FormLabel>
-                                        <FormDescription>
-                                            Podés activar o pausar el proyecto desde acá.
-                                        </FormDescription>
-                                    </div>
-                                    <FormControl>
-                                        <Switch
-                                            checked={field.value}
-                                            onCheckedChange={field.onChange}
-                                        />
-                                    </FormControl>
-                                </FormItem>
-                            )}
-                        />
+            <Button type="submit" className="w-full" disabled={isSubmitting}>
+              {isSubmitting ? "Creando..." : "Crear Proyecto"}
+            </Button>
+          </form>
+        </Form>
+      </CardContent>
 
-                        {/* Botón submit */}
-                        <Button type="submit" className="w-full" disabled={isSubmitting}>
-                            {isSubmitting ? "Creando..." : "Crear Proyecto"}
-                        </Button>
-                    </form>
-                </Form>
-            </CardContent>
-
-            <CardFooter className="flex justify-between border-t pt-6 flex-col sm:flex-row gap-4 sm:gap-0">
-                <Button variant="outline" onClick={() => form.reset()}>
-                    Reiniciar formulario
-                </Button>
-            </CardFooter>
-        </Card>
-    )
+      <CardFooter className="flex justify-between border-t pt-6 flex-col sm:flex-row gap-4 sm:gap-0">
+        <Button variant="outline" onClick={() => form.reset()}>
+          Reiniciar formulario
+        </Button>
+      </CardFooter>
+    </Card>
+  );
 }
