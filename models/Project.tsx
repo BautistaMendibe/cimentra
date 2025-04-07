@@ -17,4 +17,5 @@ export interface Proyecto {
   localidad?: string;
   tipo?: string;
   estado?: string;
+  icono_tipo?: string; // Icono del tipo de proyecto
 }

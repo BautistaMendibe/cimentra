@@ -23,7 +23,7 @@ export default function ProjectsPage() {
         *,
         provincias(nombre),
         localidades(nombre),
-        tipos_proyecto(nombre),
+        tipos_proyecto(nombre, icono),
         estados_proyecto(nombre)
     `)
             .order("id", { ascending: false });
@@ -41,6 +41,7 @@ export default function ProjectsPage() {
               localidad: p.localidades?.nombre,
               tipo: p.tipos_proyecto?.nombre,
               estado: p.estados_proyecto?.nombre,
+              icono_tipo: p.tipos_proyecto?.icono,
             })) as Proyecto[]
           );
     }

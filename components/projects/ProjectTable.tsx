@@ -29,7 +29,10 @@ export default function ProjectsTable({ proyectos }: Props) {
           {proyectos.map((proyecto: Proyecto) => (
             <tr key={proyecto.id} className="border-b hover:bg-gray-50">
               <td className="p-4 font-medium">{proyecto.nombre}</td>
-              <td>{proyecto.tipo}</td>
+              <td>
+                <span className="mr-1">{proyecto.icono_tipo}</span>
+                {proyecto.tipo}
+                </td>
               <td>{proyecto.estado}</td>
               <td>{formatearFecha(proyecto.fecha_inicio)}</td>
               <td>{proyecto.fecha_fin ? formatearFecha(proyecto.fecha_fin) : "-"}</td>

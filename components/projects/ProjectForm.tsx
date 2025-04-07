@@ -196,7 +196,7 @@ export default function ProjectForm() {
         <Card className="max-w-9xl">
             <CardHeader className="flex flex-row justify-between items-center">
                 <div>
-                    <CardTitle className={"text-3xl font-bold"}>Crear Proyecto</CardTitle>
+                    <CardTitle className={"text-3xl font-bold"}>🚧 Crear Proyecto</CardTitle>
                     <CardDescription>Completá los campos para registrar un nuevo proyecto.</CardDescription>
                 </div>
                 <div className="mt-3">
