@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Loader2 } from "lucide-react";
 import { Proyecto } from "@/models/Project";
+import { toast } from "sonner";
 
 export default function ProjectDetails() {
   const { id } = useParams();
@@ -63,9 +64,8 @@ export default function ProjectDetails() {
         <div className="flex flex-col gap-1">
           <div>
             <span
-              className={`text-xs px-2 py-1 rounded-full w-fit ${
-                proyecto.activo ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"
-              }`}
+              className={`text-xs px-2 py-1 rounded-full w-fit ${proyecto.activo ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"
+                }`}
             >
               {proyecto.activo ? "Proyecto activo" : "Proyecto inactivo"}
             </span>
@@ -75,9 +75,19 @@ export default function ProjectDetails() {
             <CardDescription>Detalle completo del proyecto</CardDescription>
           </div>
         </div>
-        <Button variant="outline" size="sm" onClick={() => router.back()}>
-          ← Volver
-        </Button>
+        <div className="flex gap-2">
+          <Button variant="outline" size="sm" onClick={() => router.back()}>
+            ← Volver
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleDelete}
+            title="Eliminar proyecto"
+          >
+            🗑️
+          </Button>
+        </div>
       </CardHeader>
 
       <CardContent className="space-y-6 text-sm">
@@ -120,6 +130,22 @@ export default function ProjectDetails() {
       </CardContent>
     </Card>
   );
+
+  async function handleDelete() {
+    const confirmDelete = window.confirm("¿Estás seguro de que querés eliminar este proyecto?");
+
+    if (!confirmDelete) return;
+
+    const { error } = await supabase.from("proyecto").delete().eq("id", id);
+
+    if (error) {
+      toast.error("No se pudo eliminar el proyecto.");
+      console.error("❌ Error al eliminar:", error);
+    } else {
+      toast.success("Proyecto eliminado correctamente.");
+      router.push("/projects");
+    }
+  }
 }
 
 function formatearFecha(fecha: string) {
