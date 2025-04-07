@@ -58,7 +58,7 @@ export default function ProjectDetails() {
   }
 
   return (
-    <Card className="w-full max-w-5xl mx-auto mt-4">
+    <Card className="w-full max-w-6xl mx-auto mt-4">
       <CardHeader className="flex flex-col gap-2 sm:flex-row sm:justify-between sm:items-center">
         <div className="flex flex-col gap-1">
           <div>
