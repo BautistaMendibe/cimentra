@@ -193,22 +193,22 @@ export default function ProjectForm() {
     }
 
     return (
-        <Card className="max-w-9xl">
-            <CardHeader className="flex flex-row justify-between items-center">
+        <Card className="w-full max-w-4xl mx-auto">
+            <CardHeader className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                 <div>
-                    <CardTitle className={"text-3xl font-bold"}>🚧 Crear Proyecto</CardTitle>
-                    <CardDescription>Completá los campos para registrar un nuevo proyecto.</CardDescription>
+                    <CardTitle className="text-3xl font-bold sm:w-auto">🚧 Crear Proyecto</CardTitle>
+                    <CardDescription>
+                        Completá los campos para registrar un nuevo proyecto.
+                    </CardDescription>
                 </div>
-                <div className="mt-3">
-                    <Button variant="outline" size="sm" onClick={() => router.back()}>
-                        ← Volver
-                    </Button>
-                </div>
+                <Button variant="outline" size="sm" onClick={() => router.back()}>
+                    ← Volver
+                </Button>
             </CardHeader>
+
             <CardContent>
                 <Form {...form}>
                     <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-
                         {/* Nombre */}
                         <FormField
                             control={form.control}
@@ -238,35 +238,35 @@ export default function ProjectForm() {
                                             </SelectTrigger>
                                         </FormControl>
                                         <SelectContent>
-                                            {projectTypes.map((type) => {
-                                                return (
-                                                    <SelectItem key={type.id} value={type.id}>
+                                            {projectTypes.map((type) => (
+                                                <SelectItem key={type.id} value={type.id}>
                                                     <div className="flex items-center gap-2">
                                                         {type.icono && <span className="text-lg">{type.icono}</span>}
                                                         {type.nombre}
                                                     </div>
-                                                    </SelectItem>
-                                                );
-                                            })}
+                                                </SelectItem>
+                                            ))}
                                         </SelectContent>
                                     </Select>
-                                    <FormDescription>Categoría que mejor describe este proyecto.</FormDescription>
+                                    <FormDescription>
+                                        Categoría que mejor describe este proyecto.
+                                    </FormDescription>
                                     <FormMessage />
                                 </FormItem>
                             )}
                         />
 
                         {/* Ubicación */}
-                        <div className="mt-4">
+                        <div>
                             <FormLabel>Ubicación</FormLabel>
                         </div>
-                        <div className="flex flex-row gap-4">
+                        <div className="flex flex-col md:flex-row gap-4">
                             {/* Provincia */}
                             <FormField
                                 control={form.control}
                                 name="provincia"
                                 render={({ field }) => (
-                                    <FormItem className="flex flex-col">
+                                    <FormItem className="w-full md:w-[200px]">
                                         <Popover>
                                             <PopoverTrigger asChild>
                                                 <FormControl>
@@ -274,30 +274,30 @@ export default function ProjectForm() {
                                                         variant="outline"
                                                         role="combobox"
                                                         className={cn(
-                                                            "w-[200px] justify-between",
+                                                            "w-full justify-between",
                                                             !field.value && "text-muted-foreground"
                                                         )}
                                                     >
                                                         {field.value
-                                                            ? provincias.find((provincia) => provincia.nombre === field.value)?.nombre
+                                                            ? provincias.find((prov) => prov.nombre === field.value)?.nombre
                                                             : "Seleccionar provincia"}
                                                         <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                                                     </Button>
                                                 </FormControl>
                                             </PopoverTrigger>
-                                            <PopoverContent className="w-[200px] p-0">
+                                            <PopoverContent className="w-full p-0">
                                                 <Command>
                                                     <CommandInput placeholder="Buscar provincia..." />
                                                     <CommandList>
-                                                        <CommandEmpty>Ninguna provincia encontrada.</CommandEmpty>
+                                                        <CommandEmpty>No se encontraron provincias.</CommandEmpty>
                                                         <CommandGroup>
                                                             {provincias.map((provincia) => (
                                                                 <CommandItem
-                                                                    value={provincia.nombre}
                                                                     key={provincia.id}
-                                                                    onSelect={(currentValue) => {
-                                                                        form.setValue("provincia", currentValue);
-                                                                        form.setValue("localidad", ""); // Resetea la localidad si cambia la provincia
+                                                                    value={provincia.nombre}
+                                                                    onSelect={(val) => {
+                                                                        form.setValue("provincia", val);
+                                                                        form.setValue("localidad", "");
                                                                     }}
                                                                 >
                                                                     {provincia.nombre}
@@ -319,13 +319,12 @@ export default function ProjectForm() {
                                 )}
                             />
 
-
                             {/* Localidad */}
                             <FormField
                                 control={form.control}
                                 name="localidad"
                                 render={({ field }) => (
-                                    <FormItem className="flex flex-col">
+                                    <FormItem className="w-full md:w-[200px]">
                                         <Popover>
                                             <PopoverTrigger asChild>
                                                 <FormControl>
@@ -333,7 +332,7 @@ export default function ProjectForm() {
                                                         variant="outline"
                                                         role="combobox"
                                                         className={cn(
-                                                            "w-[200px] justify-between",
+                                                            "w-full justify-between",
                                                             !field.value && "text-muted-foreground"
                                                         )}
                                                         disabled={!provinciaSeleccionada}
@@ -345,7 +344,7 @@ export default function ProjectForm() {
                                                     </Button>
                                                 </FormControl>
                                             </PopoverTrigger>
-                                            <PopoverContent className="w-[200px] p-0">
+                                            <PopoverContent className="w-full p-0">
                                                 <Command>
                                                     <CommandInput placeholder="Buscar localidad..." />
                                                     <CommandList>
@@ -353,11 +352,9 @@ export default function ProjectForm() {
                                                         <CommandGroup>
                                                             {localidades.map((localidad) => (
                                                                 <CommandItem
-                                                                    value={localidad.nombre}
                                                                     key={localidad.id}
-                                                                    onSelect={(currentValue) => {
-                                                                        form.setValue("localidad", currentValue);
-                                                                    }}
+                                                                    value={localidad.nombre}
+                                                                    onSelect={(val) => form.setValue("localidad", val)}
                                                                 >
                                                                     {localidad.nombre}
                                                                     <Check
@@ -378,7 +375,6 @@ export default function ProjectForm() {
                                 )}
                             />
 
-
                             {/* Calle */}
                             <FormField
                                 control={form.control}
@@ -394,61 +390,84 @@ export default function ProjectForm() {
                             />
                         </div>
 
+                        {/* Fechas */}
+                        <div className="flex flex-col md:flex-row gap-4">
+                            {/* Fecha inicio */}
+                            <FormField
+                                control={form.control}
+                                name="startDate"
+                                render={({ field }) => (
+                                    <FormItem className="w-full">
+                                        <FormLabel>Fecha de Inicio</FormLabel>
+                                        <Popover>
+                                            <PopoverTrigger asChild>
+                                                <FormControl>
+                                                    <Button
+                                                        variant="outline"
+                                                        className={cn(
+                                                            "w-full pl-3 text-left font-normal",
+                                                            !field.value && "text-muted-foreground"
+                                                        )}
+                                                    >
+                                                        {field.value
+                                                            ? format(field.value, "PPP")
+                                                            : "Seleccioná una fecha"}
+                                                        <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                                                    </Button>
+                                                </FormControl>
+                                            </PopoverTrigger>
+                                            <PopoverContent className="w-auto p-0" align="start">
+                                                <Calendar
+                                                    mode="single"
+                                                    selected={field.value}
+                                                    onSelect={field.onChange}
+                                                    initialFocus
+                                                />
+                                            </PopoverContent>
+                                        </Popover>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
 
-                        {/* Fecha inicio */}
-                        <FormField
-                            control={form.control}
-                            name="startDate"
-                            render={({ field }) => (
-                                <FormItem className="flex flex-col">
-                                    <FormLabel>Fecha de Inicio</FormLabel>
-                                    <Popover>
-                                        <PopoverTrigger asChild>
-                                            <FormControl>
-                                                <Button variant="outline" className={cn("w-full pl-3 text-left font-normal", !field.value && "text-muted-foreground")}>
-                                                    {field.value ? format(field.value, "PPP") : <span>Seleccioná una fecha</span>}
-                                                    <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                                                </Button>
-                                            </FormControl>
-                                        </PopoverTrigger>
-                                        <PopoverContent className="w-auto p-0" align="start">
-                                            <Calendar mode="single" selected={field.value} onSelect={field.onChange} initialFocus />
-                                        </PopoverContent>
-                                    </Popover>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-
-                        {/* Fecha fin */}
-                        <FormField
-                            control={form.control}
-                            name="endDate"
-                            render={({ field }) => (
-                                <FormItem className="flex flex-col">
-                                    <FormLabel>Fecha de Finalización</FormLabel>
-                                    <Popover>
-                                        <PopoverTrigger asChild>
-                                            <FormControl>
-                                                <Button variant="outline" className={cn("w-full pl-3 text-left font-normal", !field.value && "text-muted-foreground")}>
-                                                    {field.value ? format(field.value, "PPP") : <span>Seleccioná una fecha</span>}
-                                                    <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                                                </Button>
-                                            </FormControl>
-                                        </PopoverTrigger>
-                                        <PopoverContent className="w-auto p-0" align="start">
-                                            <Calendar
-                                                mode="single"
-                                                selected={field.value ?? undefined}
-                                                onSelect={field.onChange}
-                                                initialFocus
-                                            />
-                                        </PopoverContent>
-                                    </Popover>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
+                            {/* Fecha fin */}
+                            <FormField
+                                control={form.control}
+                                name="endDate"
+                                render={({ field }) => (
+                                    <FormItem className="w-full">
+                                        <FormLabel>Fecha de Finalización</FormLabel>
+                                        <Popover>
+                                            <PopoverTrigger asChild>
+                                                <FormControl>
+                                                    <Button
+                                                        variant="outline"
+                                                        className={cn(
+                                                            "w-full pl-3 text-left font-normal",
+                                                            !field.value && "text-muted-foreground"
+                                                        )}
+                                                    >
+                                                        {field.value
+                                                            ? format(field.value, "PPP")
+                                                            : "Seleccioná una fecha"}
+                                                        <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                                                    </Button>
+                                                </FormControl>
+                                            </PopoverTrigger>
+                                            <PopoverContent className="w-auto p-0" align="start">
+                                                <Calendar
+                                                    mode="single"
+                                                    selected={field.value ?? undefined}
+                                                    onSelect={field.onChange}
+                                                    initialFocus
+                                                />
+                                            </PopoverContent>
+                                        </Popover>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                        </div>
 
                         {/* Activo */}
                         <FormField
@@ -458,23 +477,29 @@ export default function ProjectForm() {
                                 <FormItem className="flex items-center justify-between rounded-lg border p-4">
                                     <div className="space-y-0.5">
                                         <FormLabel>¿Proyecto Activo?</FormLabel>
-                                        <FormDescription>Podés activar o pausar el proyecto desde acá.</FormDescription>
+                                        <FormDescription>
+                                            Podés activar o pausar el proyecto desde acá.
+                                        </FormDescription>
                                     </div>
                                     <FormControl>
-                                        <Switch checked={field.value} onCheckedChange={field.onChange} />
+                                        <Switch
+                                            checked={field.value}
+                                            onCheckedChange={field.onChange}
+                                        />
                                     </FormControl>
                                 </FormItem>
                             )}
                         />
 
-                        {/* Botón */}
+                        {/* Botón submit */}
                         <Button type="submit" className="w-full" disabled={isSubmitting}>
                             {isSubmitting ? "Creando..." : "Crear Proyecto"}
                         </Button>
                     </form>
                 </Form>
             </CardContent>
-            <CardFooter className="flex justify-between border-t pt-6">
+
+            <CardFooter className="flex justify-between border-t pt-6 flex-col sm:flex-row gap-4 sm:gap-0">
                 <Button variant="outline" onClick={() => form.reset()}>
                     Reiniciar formulario
                 </Button>
