@@ -18,4 +18,5 @@ export interface Proyecto {
   tipo?: string;
   estado?: string;
   icono_tipo?: string; // Icono del tipo de proyecto
+  color_estado?: string; // Color del estado del proyecto
 }

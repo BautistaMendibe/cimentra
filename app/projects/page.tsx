@@ -9,6 +9,7 @@ import { Toaster } from "@/components/ui/sonner";
 
 export default function ProjectsPage() {
     const [proyectos, setProyectos] = useState<Proyecto[]>([]);
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         getProjects();
@@ -16,6 +17,7 @@ export default function ProjectsPage() {
 
     async function getProjects() {
         const supabase = createClient();
+        setLoading(true);
 
         const { data, error } = await supabase
             .from("proyecto")
@@ -24,13 +26,14 @@ export default function ProjectsPage() {
         provincias(nombre),
         localidades(nombre),
         tipos_proyecto(nombre, icono),
-        estados_proyecto(nombre)
+        estados_proyecto(nombre, color)
     `)
             .order("id", { ascending: false });
 
 
         if (error) {
             toast.error("Error al cargar los proyectos.");
+            setLoading(false);
             return;
         }
 
@@ -42,8 +45,11 @@ export default function ProjectsPage() {
               tipo: p.tipos_proyecto?.nombre,
               estado: p.estados_proyecto?.nombre,
               icono_tipo: p.tipos_proyecto?.icono,
+              color_estado: p.estados_proyecto?.color,
             })) as Proyecto[]
           );
+
+        setLoading(false);
     }
 
     return (

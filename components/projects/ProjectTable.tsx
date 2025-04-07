@@ -7,7 +7,7 @@ type Props = {
 };
 
 export default function ProjectsTable({ proyectos }: Props) {
-  return proyectos.length === 0 ? (
+  return (proyectos.length === 0) ? (
     <div className="p-6 text-center text-gray-500">No hay resultados.</div>
   ) : (
     <div className="rounded-md border mt-5">
@@ -33,7 +33,7 @@ export default function ProjectsTable({ proyectos }: Props) {
                 <span className="mr-1">{proyecto.icono_tipo}</span>
                 {proyecto.tipo}
                 </td>
-              <td>{proyecto.estado}</td>
+              <td><EstadoProyectoTag estado={proyecto.estado} color={proyecto.color_estado} /></td>
               <td>{formatearFecha(proyecto.fecha_inicio)}</td>
               <td>{proyecto.fecha_fin ? formatearFecha(proyecto.fecha_fin) : "-"}</td>
               <td>{proyecto.provincia}</td>
@@ -79,6 +79,14 @@ function EstadoTag({ activo }: { activo: boolean }) {
     </span>
   );
 }
+
+function EstadoProyectoTag({ estado, color }: { estado?: string; color?: string }) {
+    return (
+      <span className={`text-xs px-2 py-0.5 rounded-full ${color}`}>
+        {estado}
+      </span>
+    );
+  }
 
 function formatearFecha(fecha: string) {
   const f = new Date(fecha);
