@@ -50,17 +50,27 @@ export default function ProjectsTable({ proyectos }: Props) {
                 <td>{proyecto.localidad}</td>
                 <td>{proyecto.calle}</td>
                 {/* Solo mostrar si esta inactivo con un hover de otro color en la celda, no esta todavia*/}
-                <td>
-                  <Button
-                    variant="outline"
-                    size="sm"
+                <td className="flex items-center gap-2 px-2 py-3">
+                  <button
+                    title="Ver detalles"
                     onClick={(e) => {
-                      e.stopPropagation(); // evita que dispare el click de la fila
+                      e.stopPropagation();
                       router.push(`/projects/${proyecto.id}`);
                     }}
+                    className="text-xl hover:scale-110 transition"
                   >
-                    Ver
-                  </Button>
+                    👁️
+                  </button>
+                  <button
+                    title="Editar proyecto"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      router.push(`/projects/edit/${proyecto.id}`);
+                    }}
+                    className="text-xl hover:scale-110 transition"
+                  >
+                    ✏️
+                  </button>
                 </td>
               </tr>
             ))}
@@ -118,6 +128,22 @@ export default function ProjectsTable({ proyectos }: Props) {
             </div>
             <div className="text-sm mb-1">
               <strong>Calle:</strong> {proyecto.calle}
+            </div>
+            <div className="flex gap-4 justify-end">
+              <button
+                title="Ver detalles"
+                onClick={() => router.push(`/projects/${proyecto.id}`)}
+                className="text-xl hover:scale-110 transition"
+              >
+                👁️
+              </button>
+              <button
+                title="Editar proyecto"
+                onClick={() => router.push(`/projects/edit/${proyecto.id}`)}
+                className="text-xl hover:scale-110 transition"
+              >
+                ✏️
+              </button>
             </div>
 
             {/* Solo mostrar si esta inactivo con el tag a la derecha del nombre, no esta todavia */}
