@@ -29,7 +29,6 @@ import { supabase } from "@/lib/supabase";
 import { TypeProject } from "@/models/TypeProject"
 import Provincia from "@/models/Provincia";
 import Localidad from "@/models/Localidad"
-import * as LucideIcons from "lucide-react";
 
 
 
@@ -240,14 +239,12 @@ export default function ProjectForm() {
                                         </FormControl>
                                         <SelectContent>
                                             {projectTypes.map((type) => {
-                                                const Icon = LucideIcons[type.icono as keyof typeof LucideIcons] as React.FC<{ className?: string }>;
-
                                                 return (
                                                     <SelectItem key={type.id} value={type.id}>
-                                                        <div className="flex items-center gap-2">
-                                                            {Icon && <Icon className="h-4 w-4" />}
-                                                            {type.nombre}
-                                                        </div>
+                                                    <div className="flex items-center gap-2">
+                                                        {type.icono && <span className="text-lg">{type.icono}</span>}
+                                                        {type.nombre}
+                                                    </div>
                                                     </SelectItem>
                                                 );
                                             })}
