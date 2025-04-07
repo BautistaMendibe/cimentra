@@ -1,11 +1,11 @@
-import ProjectForm from "@/components/projects/ProjectForm";
+import ProjectDetails from "@/components/projects/ProjectDetails";
 import { Toaster } from "sonner";
 
 export default function ProjectPage() {
     return (
         <div>
-        <ProjectForm />
-        <Toaster richColors position="top-center" />
+            <ProjectDetails />
+            <Toaster richColors position="top-center" />
         </div>
     );
 }

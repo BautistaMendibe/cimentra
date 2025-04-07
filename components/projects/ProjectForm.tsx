@@ -193,7 +193,7 @@ export default function ProjectForm() {
     }
 
     return (
-        <Card className="w-full max-w-4xl mx-auto">
+        <Card className="w-full max-w-4xl mx-auto mt-2">
             <CardHeader className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                 <div>
                     <CardTitle className="text-3xl font-bold sm:w-auto">🚧 Crear Proyecto</CardTitle>
