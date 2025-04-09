@@ -38,7 +38,11 @@ export default function ClientsPage() {
 
     return (
         <>
-            <ClientsPageClient clientes={clientes} loading={loading} />
+            <ClientsPageClient 
+                clientes={clientes} 
+                loading={loading} 
+                searchClients={getClients}
+            />
             <Toaster richColors position="top-center" />
         </>
     );

@@ -34,23 +34,24 @@ import { cn } from "@/lib/utils"
 
 type Props = {
   cliente: Cliente
-  onClose: () => void
+  onClose: () => void;
+  onCloseAndSearch: () => void;
 }
 
-export default function ClienteSidePanel({ cliente, onClose }: Props) {
+export default function ClienteSidePanel({ cliente, onClose, onCloseAndSearch }: Props) {
   const [provincias, setProvincias] = useState<Provincia[]>([])
   const [localidades, setLocalidades] = useState<Localidad[]>([])
 
   const form = useForm({
     defaultValues: {
-      nombre: cliente.nombre,
-      apellido: cliente.apellido,
+      nombre: cliente.nombre ?? "",
+      apellido: cliente.apellido ?? "",
       email: cliente.email ?? "",
       telefono: cliente.telefono ?? "",
       provincia: cliente.provincia ?? "",
       localidad: cliente.localidad ?? "",
       calle: cliente.calle ?? ""
-    }
+    }    
   })
 
   const provinciaSeleccionada = useMemo(() => {
@@ -103,6 +104,54 @@ export default function ClienteSidePanel({ cliente, onClose }: Props) {
     }
   }
 
+  const onSubmit = async (values: any) => {
+    const idProvincia = provincias.find(p => p.nombre === values.provincia)?.id
+    const idLocalidad = localidades.find(l => l.nombre === values.localidad)?.id
+  
+    if (!idProvincia || !idLocalidad) {
+      toast.error("Seleccioná una provincia y localidad válidas.")
+      return
+    }
+  
+    const payload = {
+      nombre: values.nombre,
+      apellido: values.apellido,
+      email: values.email,
+      telefono: values.telefono,
+      id_provincia: idProvincia,
+      id_localidad: idLocalidad,
+      calle: values.calle
+    }
+  
+    if (cliente.id) {
+      // Update
+      const { error } = await supabase
+        .from("cliente")
+        .update(payload)
+        .eq("id", cliente.id)
+  
+      if (error) {
+        toast.error("Error al actualizar el cliente.")
+      } else {
+        toast.success("Cliente actualizado correctamente.")
+        onCloseAndSearch()
+      }
+    } else {
+      // Insert
+      const { error } = await supabase
+        .from("cliente")
+        .insert(payload)
+  
+      if (error) {
+        toast.error("Error al crear el cliente.")
+      } else {
+        toast.success("Cliente creado correctamente.")
+        onCloseAndSearch()
+      }
+    }
+  }
+  
+
   return (
     <Form {...form}>
       <div className="fixed right-0 top-[75px] h-[calc(100vh-75px)] w-[100vw] sm:w-[40vw] bg-white border-l shadow-md z-10 flex flex-col">
@@ -121,7 +170,7 @@ export default function ClienteSidePanel({ cliente, onClose }: Props) {
           <Tabs defaultValue="datos" className="p-4">
             <TabsList className="w-full grid grid-cols-2 mb-4">
               <TabsTrigger value="datos">Datos</TabsTrigger>
-              <TabsTrigger value="proyectos">Proyectos</TabsTrigger>
+              <TabsTrigger value="proyectos">Proyectos vinculados</TabsTrigger>
             </TabsList>
 
             <TabsContent value="datos" className="space-y-4">
@@ -323,7 +372,7 @@ export default function ClienteSidePanel({ cliente, onClose }: Props) {
         </div>
 
         <div className="p-4 border-t">
-          <Button className="w-full">Guardar cambios</Button>
+          <Button className="w-full" onClick={form.handleSubmit(onSubmit)}>Guardar cambios</Button>
         </div>
 
       </div>

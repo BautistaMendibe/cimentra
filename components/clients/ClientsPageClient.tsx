@@ -15,6 +15,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../ui/
 type Props = {
     clientes: Cliente[];
     loading: boolean;
+    searchClients: () => void;
 }
 
 export default function ClientsPageClient(props: Props) {
@@ -117,6 +118,10 @@ export default function ClientsPageClient(props: Props) {
                     <ClienteSidePanel
                         cliente={clienteSeleccionado}
                         onClose={() => setClienteSeleccionado(null)}
+                        onCloseAndSearch={() => {
+                            setClienteSeleccionado(null);
+                            props.searchClients();
+                        }}
                     />
                 )}
             </div>
