@@ -67,6 +67,7 @@ export default function ClientsTable({ clientes, onClienteClick }: Props) {
           <div
             key={cliente.id}
             className="border rounded-md p-4 shadow-sm bg-white"
+            onClick={() => onClienteClick(cliente)}
           >
             <div className="font-semibold text-lg mb-1">{cliente.nombre}</div>
             <div className="text-sm mb-1">
