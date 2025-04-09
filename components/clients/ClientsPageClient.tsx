@@ -47,12 +47,12 @@ export default function ClientsPageClient(props: Props) {
                         <Tooltip>
                             <TooltipTrigger asChild>
                                 <Link href="/projects/new">
-                                    <Button size="icon" variant="default">
+                                    <Button className="gap-2 w-full sm:w-auto">
                                         <Plus className="h-4 w-4" />
+                                        Nuevo cliente
                                     </Button>
                                 </Link>
                             </TooltipTrigger>
-                            <TooltipContent side="bottom">Nuevo cliente</TooltipContent>
                         </Tooltip>
 
                         <Tooltip>
@@ -105,7 +105,7 @@ export default function ClientsPageClient(props: Props) {
             </div>
 
             <div className="relative">
-                <div className="pr-[400px]"> {/* espacio reservado para el panel */}
+                <div > {/* espacio reservado para el panel */}
                     {/* Tabla de clientes */}
                     <ClientsTable
                         clientes={clientes}

@@ -9,6 +9,7 @@ import { Input } from "../ui/input";
 import { FiltrosDropdown } from "../FiltrosDropdown";
 import { AgruparPorDropdown } from "../AgruparPorDropdown";
 import ProjectsTable from "./ProjectTable";
+import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
 
 type Props = {
     proyectos: Proyecto[];
@@ -44,22 +45,26 @@ export default function ProjectsClient(props: Props) {
                             Nuevo proyecto
                         </Button>
                     </Link>
-                    <Button variant="outline" className="gap-2 w-full sm:w-auto">
-                        <svg
-                            className="h-4 w-4"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                        >
-                            <path
-                                d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"
-                                strokeWidth="2"
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                            />
-                        </svg>
-                        Descargar CSV
-                    </Button>
+                    <Tooltip>
+                            <TooltipTrigger asChild>
+                                <Button size="icon" variant="outline">
+                                    <svg
+                                        className="h-4 w-4"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="currentColor"
+                                    >
+                                        <path
+                                            d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"
+                                            strokeWidth="2"
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                        />
+                                    </svg>
+                                </Button>
+                            </TooltipTrigger>
+                            <TooltipContent side="bottom">Descargar CSV</TooltipContent>
+                        </Tooltip>
                 </div>
             </div>
 
