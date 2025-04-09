@@ -9,6 +9,9 @@ import { FiltrosDropdown } from "../FiltrosDropdown";
 import { AgruparPorDropdown } from "../AgruparPorDropdown";
 import Cliente from "@/models/Cliente";
 import ClientsTable from "./ClientsTable";
+import { ClienteDrawerEditable } from "./ClienteDrawerEditable"
+import ClienteSidePanel from "./ClienteSidePanel";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../ui/tooltip";
 
 type Props = {
     clientes: Cliente[];
@@ -19,6 +22,8 @@ export default function ClientsPageClient(props: Props) {
     const [filtroNombre, setFiltroNombre] = useState("");
     const [filtroCliente, setFiltroCliente] = useState("");
     const [filtroTipo, setFiltroTipo] = useState("");
+    const [clienteSeleccionado, setClienteSeleccionado] = useState<Cliente | null>(null)
+
 
     const clientesFiltrados = useMemo(() => {
         return props.clientes;
@@ -34,33 +39,44 @@ export default function ClientsPageClient(props: Props) {
     return (
         <div className="p-4 sm:p-6">
             {/* Header: título + botones */}
-            <div className="mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+            <div className="mb-6 flex justify-between items-center">
                 <h1 className="text-3xl sm:text-4xl font-bold">Clientes</h1>
 
-                <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
-                    <Link href="/projects/new">
-                        <Button className="gap-2 w-full sm:w-auto">
-                            <Plus className="h-4 w-4" />
-                            Nuevo cliente
-                        </Button>
-                    </Link>
-                    <Button variant="outline" className="gap-2 w-full sm:w-auto">
-                        <svg
-                            className="h-4 w-4"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                        >
-                            <path
-                                d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"
-                                strokeWidth="2"
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                            />
-                        </svg>
-                        Descargar CSV
-                    </Button>
-                </div>
+                <TooltipProvider>
+                    <div className="flex gap-2">
+                        <Tooltip>
+                            <TooltipTrigger asChild>
+                                <Link href="/projects/new">
+                                    <Button size="icon" variant="default">
+                                        <Plus className="h-4 w-4" />
+                                    </Button>
+                                </Link>
+                            </TooltipTrigger>
+                            <TooltipContent side="bottom">Nuevo cliente</TooltipContent>
+                        </Tooltip>
+
+                        <Tooltip>
+                            <TooltipTrigger asChild>
+                                <Button size="icon" variant="outline">
+                                    <svg
+                                        className="h-4 w-4"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="currentColor"
+                                    >
+                                        <path
+                                            d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"
+                                            strokeWidth="2"
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                        />
+                                    </svg>
+                                </Button>
+                            </TooltipTrigger>
+                            <TooltipContent side="bottom">Descargar CSV</TooltipContent>
+                        </Tooltip>
+                    </div>
+                </TooltipProvider>
             </div>
 
             {/* Filtros y búsqueda */}
@@ -88,8 +104,22 @@ export default function ClientsPageClient(props: Props) {
                 </div>
             </div>
 
-            {/* Tabla de clientes */}
-            <ClientsTable clientes={clientes} />
+            <div className="relative">
+                <div className="pr-[400px]"> {/* espacio reservado para el panel */}
+                    {/* Tabla de clientes */}
+                    <ClientsTable
+                        clientes={clientes}
+                        onClienteClick={(cliente) => setClienteSeleccionado(cliente)}
+                    />
+                </div>
+                {/* Pantalla lateral para ver detalles y editar */}
+                {clienteSeleccionado && (
+                    <ClienteSidePanel
+                        cliente={clienteSeleccionado}
+                        onClose={() => setClienteSeleccionado(null)}
+                    />
+                )}
+            </div>
         </div>
     );
 

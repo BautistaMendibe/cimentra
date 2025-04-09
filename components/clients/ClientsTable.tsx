@@ -7,9 +7,10 @@ import Cliente from "@/models/Cliente";
 
 type Props = {
   clientes: Cliente[];
+  onClienteClick: (cliente: Cliente) => void
 };
 
-export default function ClientsTable({ clientes }: Props) {
+export default function ClientsTable({ clientes, onClienteClick }: Props) {
 
   const router = useRouter();
 
@@ -20,7 +21,7 @@ export default function ClientsTable({ clientes }: Props) {
   return (
     <div className="mt-5">
       {/* Tabla - visible solo en sm en adelante */}
-      <div className="hidden sm:block rounded-md border overflow-x-auto">
+      <div className=" overflow-auto max-h-[70vh] hidden sm:block rounded-md border overflow-x-auto">
         <table className="w-full text-sm text-left">
           <thead className="bg-gray-50 border-b text-gray-600 uppercase text-xs">
             <tr>
@@ -32,32 +33,10 @@ export default function ClientsTable({ clientes }: Props) {
           </thead>
           <tbody>
             {clientes.map((cliente: Cliente) => (
-              <tr key={cliente.id} className="border-b hover:bg-gray-50 cursor-pointer" onClick={() => router.push(`/projects/${cliente.id}`)}>
+              <tr key={cliente.id} className="border-b hover:bg-gray-50 cursor-pointer" onClick={() => onClienteClick(cliente)}>
                 <td className="p-4 font-medium">{cliente.nombre}</td>
                 <td>{cliente.direccion}</td>
             
-                <td className="flex items-center gap-2 px-2 py-3">
-                  <button
-                    title="Ver detalles"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      router.push(`/projects/${cliente.id}`);
-                    }}
-                    className="text-xl hover:scale-110 transition"
-                  >
-                    👁️
-                  </button>
-                  <button
-                    title="Editar proyecto"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      router.push(`/projects/edit/${cliente.id}`);
-                    }}
-                    className="text-xl hover:scale-110 transition"
-                  >
-                    ✏️
-                  </button>
-                </td>
               </tr>
             ))}
           </tbody>
@@ -92,22 +71,6 @@ export default function ClientsTable({ clientes }: Props) {
             <div className="font-semibold text-lg mb-1">{cliente.nombre}</div>
             <div className="text-sm mb-1">
               <strong>Dirección:</strong> {cliente.direccion}
-            </div>
-            <div className="flex gap-4 justify-end">
-              <button
-                title="Ver detalles"
-                onClick={() => router.push(`/projects/${cliente.id}`)}
-                className="text-xl hover:scale-110 transition"
-              >
-                👁️
-              </button>
-              <button
-                title="Editar proyecto"
-                onClick={() => router.push(`/projects/edit/${cliente.id}`)}
-                className="text-xl hover:scale-110 transition"
-              >
-                ✏️
-              </button>
             </div>
 
           </div>
