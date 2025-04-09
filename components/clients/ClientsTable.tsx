@@ -34,7 +34,8 @@ export default function ClientsTable({ clientes, onClienteClick, loading }: Prop
           <thead className="bg-gray-50 border-b text-gray-600 uppercase text-xs">
             <tr>
               <th className="p-4">Nombre</th>
-              <th>Dirección</th>
+              <th className="p-4">Mail</th>
+              <th className="p-4">Teléfono</th>
               <th></th>
               {/* Solo mostrar si esta inactivo con un hover de otro color en la celda, no esta todavia */}
             </tr>
@@ -42,9 +43,9 @@ export default function ClientsTable({ clientes, onClienteClick, loading }: Prop
           <tbody>
             {clientes.map((cliente: Cliente) => (
               <tr key={cliente.id} className="border-b hover:bg-gray-50 cursor-pointer" onClick={() => onClienteClick(cliente)}>
-                <td className="p-4 font-medium">{cliente.nombre}</td>
-                <td>{cliente.direccion}</td>
-
+                <td className="p-4 font-medium">{cliente.nombre + ' ' + cliente.apellido}</td>
+                <td>{cliente.email ?? '-'}</td>
+                <td>{cliente.telefono ?? '-'}</td>
               </tr>
             ))}
           </tbody>
