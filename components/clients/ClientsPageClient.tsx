@@ -45,7 +45,7 @@ export default function ClientsPageClient(props: Props) {
                     <div className="flex gap-2">
                         <Tooltip>
                             <TooltipTrigger asChild>
-                                <Button className="gap-2 w-full sm:w-auto" onClick={() => setClienteSeleccionado({} as Cliente)}>
+                                <Button className="gap-2 p-2 sm:w-auto w-full" size="icon" onClick={() => setClienteSeleccionado({} as Cliente)}>
                                     <Plus className="h-4 w-4" />
                                     <p className="hidden sm:inline">Nuevo cliente</p>
                                 </Button>
