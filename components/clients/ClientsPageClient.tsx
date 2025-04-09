@@ -45,12 +45,10 @@ export default function ClientsPageClient(props: Props) {
                     <div className="flex gap-2">
                         <Tooltip>
                             <TooltipTrigger asChild>
-                                <Link href="/projects/new">
-                                    <Button className="gap-2 w-full sm:w-auto">
-                                        <Plus className="h-4 w-4" />
-                                        <p className="hidden sm:inline">Nuevo cliente</p>
-                                    </Button>
-                                </Link>
+                                <Button className="gap-2 w-full sm:w-auto" onClick={() => setClienteSeleccionado({} as Cliente)}>
+                                    <Plus className="h-4 w-4" />
+                                    <p className="hidden sm:inline">Nuevo cliente</p>
+                                </Button>
                             </TooltipTrigger>
                         </Tooltip>
 
@@ -104,13 +102,14 @@ export default function ClientsPageClient(props: Props) {
             </div>
 
             <div className="relative">
-                <div > {/* espacio reservado para el panel */}
-                    {/* Tabla de clientes */}
+                {/* Tabla de clientes */}
+                <div >
                     <ClientsTable
                         clientes={clientes}
                         onClienteClick={(cliente) => setClienteSeleccionado(cliente)}
                     />
                 </div>
+
                 {/* Pantalla lateral para ver detalles y editar */}
                 {clienteSeleccionado && (
                     <ClienteSidePanel
