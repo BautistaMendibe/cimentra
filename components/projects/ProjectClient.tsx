@@ -13,6 +13,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
 
 type Props = {
     proyectos: Proyecto[];
+    loading: boolean
 }
 
 export default function ProjectsClient(props: Props) {
@@ -94,7 +95,7 @@ export default function ProjectsClient(props: Props) {
             </div>
 
             {/* Tabla de proyectos */}
-            <ProjectsTable proyectos={proyectos} />
+            <ProjectsTable proyectos={proyectos} loading={props.loading}/>
         </div>
     );
 

@@ -14,6 +14,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../ui/
 
 type Props = {
     clientes: Cliente[];
+    loading: boolean;
 }
 
 export default function ClientsPageClient(props: Props) {
@@ -107,6 +108,7 @@ export default function ClientsPageClient(props: Props) {
                     <ClientsTable
                         clientes={clientes}
                         onClienteClick={(cliente) => setClienteSeleccionado(cliente)}
+                        loading={props.loading}
                     />
                 </div>
 

@@ -1,20 +1,28 @@
 "use client";
 
-import { Proyecto } from "@/models/Project";
 import { useRouter } from "next/navigation";
-import { Button } from "../ui/button";
 import Cliente from "@/models/Cliente";
+import { Loader2 } from "lucide-react";
 
 type Props = {
   clientes: Cliente[];
-  onClienteClick: (cliente: Cliente) => void
+  onClienteClick: (cliente: Cliente) => void;
+  loading: boolean;
 };
 
-export default function ClientsTable({ clientes, onClienteClick }: Props) {
+export default function ClientsTable({ clientes, onClienteClick, loading }: Props) {
 
   const router = useRouter();
 
-  if (clientes.length === 0) {
+  if (loading) {
+    return (
+      <div className="p-6 flex justify-center items-center text-gray-500">
+        <Loader2 className="animate-spin mr-2 h-5 w-5" />
+      </div>
+    );
+  }
+
+  if (clientes.length === 0 && !loading) {
     return <div className="p-6 text-center text-gray-500">No hay resultados.</div>;
   }
 
@@ -36,7 +44,7 @@ export default function ClientsTable({ clientes, onClienteClick }: Props) {
               <tr key={cliente.id} className="border-b hover:bg-gray-50 cursor-pointer" onClick={() => onClienteClick(cliente)}>
                 <td className="p-4 font-medium">{cliente.nombre}</td>
                 <td>{cliente.direccion}</td>
-            
+
               </tr>
             ))}
           </tbody>

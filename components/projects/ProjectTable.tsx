@@ -3,16 +3,26 @@
 import { Proyecto } from "@/models/Project";
 import { useRouter } from "next/navigation";
 import { Button } from "../ui/button";
+import { Loader2 } from "lucide-react";
 
 type Props = {
   proyectos: Proyecto[];
+  loading: boolean;
 };
 
-export default function ProjectsTable({ proyectos }: Props) {
+export default function ProjectsTable({ proyectos, loading }: Props) {
 
   const router = useRouter();
 
-  if (proyectos.length === 0) {
+  if (loading) {
+    return (
+      <div className="p-6 flex justify-center items-center text-gray-500">
+        <Loader2 className="animate-spin mr-2 h-5 w-5" />
+      </div>
+    );
+  }
+
+  if (proyectos.length === 0 && !loading) {
     return <div className="p-6 text-center text-gray-500">No hay resultados.</div>;
   }
 

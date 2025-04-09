@@ -38,7 +38,7 @@ export default function ClientsPage() {
 
     return (
         <>
-            <ClientsPageClient clientes={clientes} />
+            <ClientsPageClient clientes={clientes} loading={loading} />
             <Toaster richColors position="top-center" />
         </>
     );
