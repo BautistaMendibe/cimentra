@@ -22,7 +22,7 @@ export default function ClienteSidePanel({ cliente, onClose }: Props) {
   })
 
   return (
-    <div className="fixed right-0 top-[120px] h-[calc(100vh-120px)] w-[400px] bg-white border-l shadow-md z-10 overflow-y-auto transition-all">
+    <div className="fixed right-0 top-[75px] h-[calc(100vh)] w-[calc(40vw)] bg-white border-l shadow-md z-10 overflow-y-auto transition-all">
       <div className="flex justify-between items-center p-4 border-b">
         <h2 className="text-lg font-semibold">Cliente</h2>
         <Button size="sm" variant="ghost" onClick={onClose}>✕</Button>

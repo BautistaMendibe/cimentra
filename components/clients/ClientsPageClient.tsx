@@ -9,7 +9,6 @@ import { FiltrosDropdown } from "../FiltrosDropdown";
 import { AgruparPorDropdown } from "../AgruparPorDropdown";
 import Cliente from "@/models/Cliente";
 import ClientsTable from "./ClientsTable";
-import { ClienteDrawerEditable } from "./ClienteDrawerEditable"
 import ClienteSidePanel from "./ClienteSidePanel";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../ui/tooltip";
 
