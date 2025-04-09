@@ -42,7 +42,7 @@ export default function ProjectsClient(props: Props) {
                     <Link href="/projects/new">
                         <Button className="gap-2 w-full sm:w-auto">
                             <Plus className="h-4 w-4" />
-                            Nuevo proyecto
+                            <p className="hidden sm:inline">Nuevo proyecto</p>
                         </Button>
                     </Link>
                     <Tooltip>

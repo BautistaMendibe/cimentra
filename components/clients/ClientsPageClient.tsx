@@ -48,7 +48,7 @@ export default function ClientsPageClient(props: Props) {
                                 <Link href="/projects/new">
                                     <Button className="gap-2 w-full sm:w-auto">
                                         <Plus className="h-4 w-4" />
-                                        Nuevo cliente
+                                        <p className="hidden sm:inline">Nuevo cliente</p>
                                     </Button>
                                 </Link>
                             </TooltipTrigger>
