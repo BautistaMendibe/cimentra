@@ -78,11 +78,13 @@ export default function ClientsTable({ clientes, onClienteClick, loading }: Prop
             className="border rounded-md p-4 shadow-sm bg-white"
             onClick={() => onClienteClick(cliente)}
           >
-            <div className="font-semibold text-lg mb-1">{cliente.nombre}</div>
+            <div className="font-semibold text-lg mb-1">{cliente.nombre + ' ' + cliente.apellido}</div>
             <div className="text-sm mb-1">
-              <strong>Dirección:</strong> {cliente.direccion}
+              <strong>Mail:</strong> {cliente.email ?? '-'}
             </div>
-
+            <div className="text-sm mb-1">
+              <strong>Teléfono:</strong> {cliente.telefono ?? '-'}
+            </div>
           </div>
         ))}
       </div>
