@@ -39,8 +39,10 @@ type Props = {
 }
 
 export default function ClienteSidePanel({ cliente, onClose, onCloseAndSearch }: Props) {
-  const [provincias, setProvincias] = useState<Provincia[]>([])
-  const [localidades, setLocalidades] = useState<Localidad[]>([])
+  const [provincias, setProvincias] = useState<Provincia[]>([]);
+  const [localidades, setLocalidades] = useState<Localidad[]>([]);
+  const [localidadCliente, setLocalidadToForm] = useState<Localidad>();
+  const [provinciaCliente, setProvinciaToForm] = useState<Provincia>()
 
   const form = useForm({
     defaultValues: {
@@ -51,7 +53,7 @@ export default function ClienteSidePanel({ cliente, onClose, onCloseAndSearch }:
       provincia: cliente.provincia ?? "",
       localidad: cliente.localidad ?? "",
       calle: cliente.calle ?? ""
-    }    
+    }
   })
 
   const provinciaSeleccionada = useMemo(() => {
@@ -65,28 +67,47 @@ export default function ClienteSidePanel({ cliente, onClose, onCloseAndSearch }:
   }, [form.watch("localidad"), localidades])
 
   useEffect(() => {
-    getProvincias()
-  }, [])
-
-  useEffect(() => {
     if (provinciaSeleccionada) {
       fetchLocalidades(provinciaSeleccionada.id)
     }
   }, [provinciaSeleccionada])
 
-  async function getProvincias() {
-    const { data, error } = await supabase.from("provincias").select("*")
-    if (!error && data) {
-      const provincias: Provincia[] = data.map((item: Provincia) => ({
-        id: String(item.id),
-        nombre: item.nombre,
-        localidades: []
-      }))
-      setProvincias(provincias)
-    } else {
-      toast.error("Error al cargar las provincias.")
+  useEffect(() => {
+    const fetchProvincias = async () => {
+      const { data, error } = await supabase.from("provincias").select("*")
+
+      if (!error && data) {
+        const provincias: Provincia[] = data.map((item: Provincia) => ({
+          id: String(item.id),
+          nombre: item.nombre,
+          localidades: [],
+        }))
+        setProvincias(provincias);
+
+        if (cliente.id_provincia) {
+          const provinciaCliente = provincias.find(p => p.id === String(cliente.id_provincia));
+          if (provinciaCliente) {
+            form.setValue("provincia", provinciaCliente.nombre)
+            fetchLocalidades(provinciaCliente.id)
+          }
+        }
+      } else {
+        toast.error("Error al cargar las provincias.")
+      }
     }
-  }
+
+    fetchProvincias();
+  }, []);
+
+  // Setear localidad una vez que localidades estén cargadas y cliente tenga valor
+  useEffect(() => {
+    if (cliente.id_localidad && localidades.length > 0) {
+      const localidadCliente = localidades.find(l => l.id === String(cliente.id_localidad));
+      if (localidadCliente) {
+        form.setValue("localidad", localidadCliente.nombre)
+      }
+    }
+  }, [localidades, cliente.id_localidad])
 
   async function fetchLocalidades(idProvincia: string) {
     const { data, error } = await supabase
@@ -107,12 +128,12 @@ export default function ClienteSidePanel({ cliente, onClose, onCloseAndSearch }:
   const onSubmit = async (values: any) => {
     const idProvincia = provincias.find(p => p.nombre === values.provincia)?.id
     const idLocalidad = localidades.find(l => l.nombre === values.localidad)?.id
-  
+
     if (!idProvincia || !idLocalidad) {
       toast.error("Seleccioná una provincia y localidad válidas.")
       return
     }
-  
+
     const payload = {
       nombre: values.nombre,
       apellido: values.apellido,
@@ -122,14 +143,14 @@ export default function ClienteSidePanel({ cliente, onClose, onCloseAndSearch }:
       id_localidad: idLocalidad,
       calle: values.calle
     }
-  
+
     if (cliente.id) {
       // Update
       const { error } = await supabase
         .from("cliente")
         .update(payload)
         .eq("id", cliente.id)
-  
+
       if (error) {
         toast.error("Error al actualizar el cliente.")
       } else {
@@ -141,7 +162,7 @@ export default function ClienteSidePanel({ cliente, onClose, onCloseAndSearch }:
       const { error } = await supabase
         .from("cliente")
         .insert(payload)
-  
+
       if (error) {
         toast.error("Error al crear el cliente.")
       } else {
@@ -150,7 +171,7 @@ export default function ClienteSidePanel({ cliente, onClose, onCloseAndSearch }:
       }
     }
   }
-  
+
 
   return (
     <Form {...form}>
