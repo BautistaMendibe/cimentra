@@ -26,7 +26,8 @@ export default function ProjectsPage() {
         provincias(nombre),
         localidades(nombre),
         tipos_proyecto(nombre, icono),
-        estados_proyecto(nombre, color)
+        estados_proyecto(nombre, color),
+        cliente(nombre, apellido)
     `)
             .order("id", { ascending: false });
 
@@ -39,22 +40,24 @@ export default function ProjectsPage() {
 
         setProyectos(
             data.map((p: any) => ({
-              ...p,
-              provincia: p.provincias?.nombre,
-              localidad: p.localidades?.nombre,
-              tipo: p.tipos_proyecto?.nombre,
-              estado: p.estados_proyecto?.nombre,
-              icono_tipo: p.tipos_proyecto?.icono,
-              color_estado: p.estados_proyecto?.color,
+                ...p,
+                provincia: p.provincias?.nombre,
+                localidad: p.localidades?.nombre,
+                tipo: p.tipos_proyecto?.nombre,
+                nombre_cliente: p.cliente?.nombre,
+                apellido_cliente: p.cliente?.apellido,
+                estado: p.estados_proyecto?.nombre,
+                icono_tipo: p.tipos_proyecto?.icono,
+                color_estado: p.estados_proyecto?.color,
             })) as Proyecto[]
-          );
+        );
 
         setLoading(false);
     }
 
     return (
         <>
-            <ProjectsClient proyectos={proyectos} loading={loading}/>
+            <ProjectsClient proyectos={proyectos} loading={loading} />
             <Toaster richColors position="top-center" />
         </>
     );

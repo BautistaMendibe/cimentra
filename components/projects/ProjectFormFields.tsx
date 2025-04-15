@@ -101,7 +101,7 @@ export default function ProjectFormFields({ form, provincias, localidades, proje
 
       <FormField
         control={form.control}
-        name="id_cliente"
+        name="cliente"
         render={({ field }) => (
           <FormItem>
             <div className="flex items-center justify-between mb-1">

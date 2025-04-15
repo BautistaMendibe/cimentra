@@ -31,23 +31,22 @@ export default function ProjectsTable({ proyectos, loading }: Props) {
       {/* Tabla - visible solo en sm en adelante */}
       <div className="hidden sm:block rounded-md border overflow-x-auto">
         <table className="w-full text-sm text-left">
-          <thead className="bg-gray-50 border-b text-gray-600 uppercase text-xs">
+          <thead className="bg-gray-50 border-b text-gray-600 uppercase text-xs text-center">
             <tr>
               <th className="p-4">Nombre</th>
               <th>Tipo</th>
               <th>Estado</th>
               <th>Inicio</th>
               <th>Fin</th>
-              <th>Provincia</th>
-              <th>Localidad</th>
-              <th>Calle</th>
+              <th>Cliente</th>
+              <th>Ubicación</th>
               <th></th>
               {/* Solo mostrar si esta inactivo con un hover de otro color en la celda, no esta todavia */}
             </tr>
           </thead>
           <tbody>
             {proyectos.map((proyecto: Proyecto) => (
-              <tr key={proyecto.id} className="border-b hover:bg-gray-50 cursor-pointer" onClick={() => router.push(`/projects/${proyecto.id}`)}>
+              <tr key={proyecto.id} className="border-b hover:bg-gray-50 cursor-pointer text-center" onClick={() => router.push(`/projects/${proyecto.id}`)}>
                 <td className="p-4 font-medium">{proyecto.nombre}</td>
                 <td>
                   <span className="mr-1">{proyecto.icono_tipo}</span>
@@ -56,9 +55,8 @@ export default function ProjectsTable({ proyectos, loading }: Props) {
                 <td><EstadoProyectoTag estado={proyecto.estado} color={proyecto.color_estado} /></td>
                 <td>{formatearFecha(proyecto.fecha_inicio)}</td>
                 <td>{proyecto.fecha_fin ? formatearFecha(proyecto.fecha_fin) : "-"}</td>
-                <td>{proyecto.provincia}</td>
-                <td>{proyecto.localidad}</td>
-                <td>{proyecto.calle}</td>
+                <td>{proyecto.nombre_cliente} {proyecto.apellido_cliente}</td>
+                <td>{proyecto.calle}, {proyecto.localidad}, {proyecto.provincia}</td>
                 {/* Solo mostrar si esta inactivo con un hover de otro color en la celda, no esta todavia*/}
                 <td className="flex items-center gap-2 px-2 py-3">
                   <button
