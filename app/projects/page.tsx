@@ -54,7 +54,7 @@ export default function ProjectsPage() {
 
     return (
         <>
-            <ProjectsClient proyectos={proyectos} />
+            <ProjectsClient proyectos={proyectos} loading={loading}/>
             <Toaster richColors position="top-center" />
         </>
     );

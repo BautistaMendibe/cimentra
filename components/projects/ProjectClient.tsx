@@ -9,9 +9,11 @@ import { Input } from "../ui/input";
 import { FiltrosDropdown } from "../FiltrosDropdown";
 import { AgruparPorDropdown } from "../AgruparPorDropdown";
 import ProjectsTable from "./ProjectTable";
+import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
 
 type Props = {
     proyectos: Proyecto[];
+    loading: boolean
 }
 
 export default function ProjectsClient(props: Props) {
@@ -39,27 +41,31 @@ export default function ProjectsClient(props: Props) {
 
                 <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
                     <Link href="/projects/new">
-                        <Button className="gap-2 w-full sm:w-auto">
+                        <Button className="gap-2 p-2 sm:w-auto w-full" size="icon">
                             <Plus className="h-4 w-4" />
-                            Nuevo proyecto
+                            <p className="hidden sm:inline">Nuevo proyecto</p>
                         </Button>
                     </Link>
-                    <Button variant="outline" className="gap-2 w-full sm:w-auto">
-                        <svg
-                            className="h-4 w-4"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                        >
-                            <path
-                                d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"
-                                strokeWidth="2"
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                            />
-                        </svg>
-                        Descargar CSV
-                    </Button>
+                    <Tooltip>
+                        <TooltipTrigger asChild>
+                            <Button size="icon" variant="outline">
+                                <svg
+                                    className="h-4 w-4"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                >
+                                    <path
+                                        d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"
+                                        strokeWidth="2"
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                    />
+                                </svg>
+                            </Button>
+                        </TooltipTrigger>
+                        <TooltipContent side="bottom">Descargar CSV</TooltipContent>
+                    </Tooltip>
                 </div>
             </div>
 
@@ -89,7 +95,7 @@ export default function ProjectsClient(props: Props) {
             </div>
 
             {/* Tabla de proyectos */}
-            <ProjectsTable proyectos={proyectos} />
+            <ProjectsTable proyectos={proyectos} loading={props.loading}/>
         </div>
     );
 

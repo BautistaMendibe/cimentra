@@ -30,7 +30,7 @@ const data = [
     title: "Gestión",
     items: [
       { icon: TruckIcon, title: "Proveedores", url: "#" },
-      { icon: PersonStandingIcon, title: "Clientes", url: "#" },
+      { icon: PersonStandingIcon, title: "Clientes", url: "/clients" },
     ],
   },
 ];
