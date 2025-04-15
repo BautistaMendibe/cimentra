@@ -33,6 +33,18 @@ export default function ProjectsClient(props: Props) {
         //});
     }, [filtroNombre, filtroCliente, filtroTipo]);
 
+    async function newProjectFromAPI() {
+        await fetch('/api/parse-intent', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              mensaje: "Quiero crear un proyecto llamado Edificio Libertador en Córdoba para el cliente Arq. Gómez que empieza el lunes y termina en junio"
+            })
+          })
+          .then(res => res.json())
+          .then(data => console.log(data))
+    }
+
     return (
         <div className="p-4 sm:p-6">
             {/* Header: título + botones */}
@@ -40,6 +52,11 @@ export default function ProjectsClient(props: Props) {
                 <h1 className="text-3xl sm:text-4xl font-bold">Proyectos</h1>
 
                 <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
+                    <Button className="gap-2 p-2 sm:w-auto w-full" size="icon" onClick={newProjectFromAPI}>
+                        <Plus className="h-4 w-4" />
+                        <p className="hidden sm:inline">Nuevo proyecto desde API</p>
+                    </Button>
+
                     <Link href="/projects/new">
                         <Button className="gap-2 p-2 sm:w-auto w-full" size="icon">
                             <Plus className="h-4 w-4" />
@@ -95,7 +112,7 @@ export default function ProjectsClient(props: Props) {
             </div>
 
             {/* Tabla de proyectos */}
-            <ProjectsTable proyectos={proyectos} loading={props.loading}/>
+            <ProjectsTable proyectos={proyectos} loading={props.loading} />
         </div>
     );
 
