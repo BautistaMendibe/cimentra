@@ -55,7 +55,7 @@ export default function ProjectsTable({ proyectos, loading }: Props) {
                 <td><EstadoProyectoTag estado={proyecto.estado} color={proyecto.color_estado} /></td>
                 <td>{formatearFecha(proyecto.fecha_inicio)}</td>
                 <td>{proyecto.fecha_fin ? formatearFecha(proyecto.fecha_fin) : "-"}</td>
-                <td>{proyecto.nombre_cliente} {proyecto.apellido_cliente}</td>
+                <td>{proyecto.cliente_nombre} {proyecto.cliente_apellido}</td>
                 <td>{proyecto.calle}, {proyecto.localidad}, {proyecto.provincia}</td>
                 {/* Solo mostrar si esta inactivo con un hover de otro color en la celda, no esta todavia*/}
                 <td className="flex items-center gap-2 px-2 py-3">

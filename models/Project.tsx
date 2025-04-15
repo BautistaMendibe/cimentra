@@ -20,6 +20,6 @@ export interface Proyecto {
   estado?: string;
   icono_tipo?: string; // Icono del tipo de proyecto
   color_estado?: string; // Color del estado del proyecto
-  nombre_cliente: string;
-  apellido_cliente: string;
+  cliente_nombre: string;
+  cliente_apellido: string;
 }
