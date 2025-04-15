@@ -15,12 +15,17 @@ import Provincia from "@/models/Provincia";
 import Localidad from "@/models/Localidad";
 import { TypeProject } from "@/models/TypeProject";
 import ProjectFormFields from "./ProjectFormFields";
+import Cliente from "@/models/Cliente";
+import { it } from "node:test";
 
 const formSchema = z.object({
   name: z.string().min(2, {
     message: "El nombre debe tener al menos 2 caracteres.",
   }),
   type: z.string({
+    required_error: "Seleccioná un tipo de proyecto.",
+  }),
+  id_cliente: z.string({
     required_error: "Seleccioná un tipo de proyecto.",
   }),
   provincia: z.string().min(2, {
@@ -45,12 +50,14 @@ export default function ProjectForm() {
   const [projectTypes, setProjectTypes] = useState<TypeProject[]>([]);
   const [provincias, setProvincias] = useState<Provincia[]>([]);
   const [localidades, setLocalidades] = useState<Localidad[]>([]);
+  const [clientes, setClientes] = useState<Cliente[]>([]);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       name: "",
       type: "",
+      id_cliente: "",
       provincia: "",
       localidad: "",
       calle: "",
@@ -73,6 +80,7 @@ export default function ProjectForm() {
   useEffect(() => {
     getTypesProjects();
     getProvincias();
+    getClientes();
   }, []);
 
   useEffect(() => {
@@ -125,6 +133,29 @@ export default function ProjectForm() {
     }
   }
 
+  async function getClientes() {
+    const { data, error } = await supabase.from("cliente").select("*");
+    if (!error && data) {
+      const clients: Cliente[] = data.map((item: Cliente) => ({
+        id: item.id,
+        nombre: item.nombre,
+        apellido: item.apellido,
+        email: item.email,
+        telefono: item.telefono,
+        provincia: item.provincia,
+        localidad: item.localidad,
+        id_provincia: item.id_provincia,
+        calle: item.calle,
+        id_localidad: item.id_localidad,
+        direccion: item.direccion,
+      }));
+      setClientes(clients);
+    } else {
+      toast.error("Error al cargar los clientes.");
+    }
+  }
+
+
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsSubmitting(true);
 
@@ -144,6 +175,7 @@ export default function ProjectForm() {
         id_provincia: Number(provinciaSeleccionada?.id),
         id_localidad: Number(localidadSeleccionada?.id),
         calle: values.calle,
+        id_cliente: values.id_cliente,
       },
     ]);
 
@@ -182,6 +214,7 @@ export default function ProjectForm() {
               provincias={provincias}
               localidades={localidades}
               projectTypes={projectTypes}
+              clientes={clientes}
             />
 
             <Button type="submit" className="w-full" disabled={isSubmitting}>
