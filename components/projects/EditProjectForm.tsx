@@ -12,13 +12,15 @@ import { Proyecto } from "@/models/Project";
 import Provincia from "@/models/Provincia";
 import Localidad from "@/models/Localidad";
 import { TypeProject } from "@/models/TypeProject";
-import ProjectFormFields from "./ProjectFormFields"; // ⚠️ Reutilizá los campos que ya tenés
+import ProjectFormFields from "./ProjectFormFields"; 
 import { Button } from "../ui/button";
 import { Form } from "../ui/form";
+import Cliente from "@/models/Cliente";
 
 const formSchema = z.object({
     name: z.string().min(2, { message: "El nombre debe tener al menos 2 caracteres." }),
     type: z.string(),
+    cliente: z.string(),
     provincia: z.string(),
     localidad: z.string(),
     calle: z.string(),
@@ -35,6 +37,7 @@ export default function EditProjectForm() {
     const [projectTypes, setProjectTypes] = useState<TypeProject[]>([]);
     const [provincias, setProvincias] = useState<Provincia[]>([]);
     const [localidades, setLocalidades] = useState<Localidad[]>([]);
+    const [clientes, setClientes] = useState<Cliente[]>([]);
     const [initialValues, setInitialValues] = useState<z.infer<typeof formSchema> | null>(null);
 
     const form = useForm<z.infer<typeof formSchema>>({
@@ -63,13 +66,19 @@ export default function EditProjectForm() {
     }, [provinciaSeleccionada]);
 
     async function fetchInitialData() {
-        const [{ data: proyecto }, { data: tipos }, { data: provs }] = await Promise.all([
+        const [
+            { data: proyecto },
+            { data: tipos },
+            { data: provs },
+            { data: clientesData }
+          ] = await Promise.all([
             supabase.from("proyecto_detalle_view").select("*").eq("id", id).single(),
             supabase.from("tipos_proyecto").select("*"),
             supabase.from("provincias").select("*"),
-        ]);
+            supabase.from("cliente").select("*"),
+          ]);
 
-        if (!proyecto || !tipos || !provs) {
+        if (!proyecto || !tipos || !provs || !clientesData) {
             toast.error("Error al cargar datos del proyecto");
             return;
         }
@@ -77,6 +86,7 @@ export default function EditProjectForm() {
         const initialData: z.infer<typeof formSchema> = {
             name: proyecto.nombre,
             type: proyecto.id_tipo.toString(),
+            cliente: proyecto.id_cliente.toString(),
             provincia: proyecto.provincia,
             localidad: proyecto.localidad,
             calle: proyecto.calle,
@@ -86,6 +96,7 @@ export default function EditProjectForm() {
         };
 
         setProjectTypes(tipos);
+        setClientes(clientesData);
         setProvincias(provs.map((p) => ({ id: String(p.id), nombre: p.nombre, localidades: [] })));
         setInitialValues(initialData);
         form.reset(initialData);
@@ -121,6 +132,7 @@ export default function EditProjectForm() {
                 id_provincia: Number(provinciaSeleccionada?.id),
                 id_localidad: Number(localidadSeleccionada?.id),
                 calle: values.calle,
+                id_cliente: values.cliente,
             })
             .eq("id", id);
 
@@ -150,6 +162,7 @@ export default function EditProjectForm() {
                         provincias={provincias}
                         localidades={localidades}
                         projectTypes={projectTypes}
+                        clientes={clientes}
                     />
 
                     <div className="flex gap-4 justify-between">

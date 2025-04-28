@@ -1,5 +1,3 @@
-"use client";
-
 import { ChevronsUpDown, Check, CalendarIcon } from "lucide-react";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
@@ -39,18 +37,24 @@ import { UseFormReturn } from "react-hook-form";
 import Localidad from "@/models/Localidad";
 import Provincia from "@/models/Provincia";
 import { TypeProject } from "@/models/TypeProject";
+import Cliente from "@/models/Cliente";
+import { useState } from "react";
+import { on } from "events";
 
 interface Props {
   form: UseFormReturn<any>;
   provincias: Provincia[];
   localidades: Localidad[];
   projectTypes: TypeProject[];
+  clientes: Cliente[];
+  onNuevoCliente: () => void;
 }
 
-export default function ProjectFormFields({ form, provincias, localidades, projectTypes }: Props) {
+export default function ProjectFormFields({ form, provincias, localidades, projectTypes, clientes, onNuevoCliente }: Props) {
+  
   const provinciaSeleccionada = provincias.find(
     (p) => p.nombre === form.watch("provincia")
-  );
+  );  
 
   return (
     <>
@@ -92,6 +96,43 @@ export default function ProjectFormFields({ form, provincias, localidades, proje
               </SelectContent>
             </Select>
             <FormDescription>Categoría que mejor describe este proyecto.</FormDescription>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+
+      <FormField
+        control={form.control}
+        name="cliente"
+        render={({ field }) => (
+          <FormItem>
+            <div className="flex items-center justify-between mb-1">
+              <FormLabel className="mb-0">Cliente</FormLabel>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={onNuevoCliente}
+              >
+                + Nuevo
+              </Button>
+            </div>
+            <Select onValueChange={field.onChange} defaultValue={field.value}>
+              <FormControl>
+                <SelectTrigger>
+                  <SelectValue placeholder="Seleccioná el cliente" />
+                </SelectTrigger>
+              </FormControl>
+              <SelectContent>
+                {clientes.map((cliente) => (
+                  <SelectItem key={cliente.id} value={String(cliente.id)}>
+                    <div className="flex items-center gap-2">
+                      {cliente.nombre + ' ' + cliente.apellido}
+                    </div>
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
             <FormMessage />
           </FormItem>
         )}

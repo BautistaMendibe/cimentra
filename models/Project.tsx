@@ -11,6 +11,7 @@ export interface Proyecto {
   id_provincia: number;
   id_localidad: number;
   calle: string;
+  id_cliente: string;
 
   // Campos relacionados opcionales (para mostrar)
   provincia?: string;
@@ -19,4 +20,6 @@ export interface Proyecto {
   estado?: string;
   icono_tipo?: string; // Icono del tipo de proyecto
   color_estado?: string; // Color del estado del proyecto
+  cliente_nombre: string;
+  cliente_apellido: string;
 }

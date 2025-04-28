@@ -144,10 +144,17 @@ export default function ProjectDetails() {
           </div>
         </div>
 
-        {/* Grupo: Ubicación */}
-        <div className="rounded-md bg-gray-50 p-4 border">
-          <p className="text-muted-foreground text-xs mb-1">Ubicación</p>
-          <p>{`${proyecto.calle}, ${proyecto.localidad}, ${proyecto.provincia}`}</p>
+        {/* Grupo: Cliente y ubicacion */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="rounded-md bg-gray-50 p-4 border">
+            <p className="text-muted-foreground text-xs mb-1">Cliente</p>
+            <p>{proyecto.cliente_nombre} {proyecto.cliente_apellido}</p>
+          </div>
+
+          <div className="rounded-md bg-gray-50 p-4 border">
+            <p className="text-muted-foreground text-xs mb-1">Ubicación</p>
+            <p>{`${proyecto.calle}, ${proyecto.localidad}, ${proyecto.provincia}`}</p>
+          </div>
         </div>
       </CardContent>
     </Card>

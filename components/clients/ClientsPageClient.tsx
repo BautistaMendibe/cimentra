@@ -117,11 +117,13 @@ export default function ClientsPageClient(props: Props) {
                 {clienteSeleccionado && (
                     <ClienteSidePanel
                         cliente={clienteSeleccionado}
+                        mostrarTabProyectos={true}
                         onClose={() => setClienteSeleccionado(null)}
                         onCloseAndSearch={() => {
                             setClienteSeleccionado(null);
                             props.searchClients();
                         }}
+                        
                     />
                 )}
             </div>
