@@ -17,6 +17,7 @@ import { TypeProject } from "@/models/TypeProject";
 import ProjectFormFields from "./ProjectFormFields";
 import Cliente from "@/models/Cliente";
 import { it } from "node:test";
+import ClienteSidePanel from "../clients/ClienteSidePanel";
 
 const formSchema = z.object({
   name: z.string().min(2, {
@@ -51,6 +52,9 @@ export default function ProjectForm() {
   const [provincias, setProvincias] = useState<Provincia[]>([]);
   const [localidades, setLocalidades] = useState<Localidad[]>([]);
   const [clientes, setClientes] = useState<Cliente[]>([]);
+  const [mostrarPanelCliente, setMostrarPanelCliente] = useState(false);
+  const [clienteActual, setClienteActual] = useState<Cliente>({} as Cliente);
+
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -215,7 +219,23 @@ export default function ProjectForm() {
               localidades={localidades}
               projectTypes={projectTypes}
               clientes={clientes}
+              onNuevoCliente={() => {
+                setClienteActual({} as Cliente); // cliente vacío
+                setMostrarPanelCliente(true);
+              }}
             />
+
+            {mostrarPanelCliente && (
+              <ClienteSidePanel
+                cliente={clienteActual}
+                mostrarTabProyectos={false}
+                onClose={() => setMostrarPanelCliente(false)}
+                onCloseAndSearch={() => {
+                  setMostrarPanelCliente(false);
+                  getClientes(); 
+                }}
+              />
+            )}
 
             <Button type="submit" className="w-full" disabled={isSubmitting}>
               {isSubmitting ? "Creando..." : "Crear Proyecto"}

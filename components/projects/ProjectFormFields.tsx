@@ -39,6 +39,7 @@ import Provincia from "@/models/Provincia";
 import { TypeProject } from "@/models/TypeProject";
 import Cliente from "@/models/Cliente";
 import { useState } from "react";
+import { on } from "events";
 
 interface Props {
   form: UseFormReturn<any>;
@@ -46,9 +47,10 @@ interface Props {
   localidades: Localidad[];
   projectTypes: TypeProject[];
   clientes: Cliente[];
+  onNuevoCliente: () => void;
 }
 
-export default function ProjectFormFields({ form, provincias, localidades, projectTypes, clientes }: Props) {
+export default function ProjectFormFields({ form, provincias, localidades, projectTypes, clientes, onNuevoCliente }: Props) {
   
   const provinciaSeleccionada = provincias.find(
     (p) => p.nombre === form.watch("provincia")
@@ -110,7 +112,7 @@ export default function ProjectFormFields({ form, provincias, localidades, proje
                 type="button"
                 variant="outline"
                 size="sm"
-                onClick={() => (true)}
+                onClick={onNuevoCliente}
               >
                 + Nuevo
               </Button>

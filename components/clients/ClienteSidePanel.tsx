@@ -33,12 +33,13 @@ import {
 import { cn } from "@/lib/utils"
 
 type Props = {
-  cliente: Cliente
+  cliente: Cliente,
+  mostrarTabProyectos: boolean,
   onClose: () => void;
   onCloseAndSearch: () => void;
 }
 
-export default function ClienteSidePanel({ cliente, onClose, onCloseAndSearch }: Props) {
+export default function ClienteSidePanel({ cliente, onClose, onCloseAndSearch, mostrarTabProyectos }: Props) {
   const [provincias, setProvincias] = useState<Provincia[]>([]);
   const [localidades, setLocalidades] = useState<Localidad[]>([]);
   const [localidadCliente, setLocalidadToForm] = useState<Localidad>();
@@ -175,7 +176,7 @@ export default function ClienteSidePanel({ cliente, onClose, onCloseAndSearch }:
 
   return (
     <Form {...form}>
-      <div className="fixed right-0 top-[75px] h-[calc(100vh-75px)] w-[100vw] sm:w-[40vw] bg-white border-l shadow-md z-10 flex flex-col">
+      <div className="fixed right-0 top-[70px] h-[calc(100vh-70px)] w-[100vw] sm:w-[40vw] bg-white border-l shadow-md z-10 flex flex-col">
         <div className="flex justify-between items-center p-4 border-b">
           <h2 className="text-lg font-semibold">
             {cliente.nombre
@@ -191,7 +192,10 @@ export default function ClienteSidePanel({ cliente, onClose, onCloseAndSearch }:
           <Tabs defaultValue="datos" className="p-4">
             <TabsList className="w-full grid grid-cols-2 mb-4">
               <TabsTrigger value="datos">Datos</TabsTrigger>
-              <TabsTrigger value="proyectos">Proyectos vinculados</TabsTrigger>
+              {mostrarTabProyectos && (
+                <TabsTrigger value="proyectos">Proyectos vinculados</TabsTrigger>
+              )}
+              
             </TabsList>
 
             <TabsContent value="datos" className="space-y-4">

@@ -129,13 +129,10 @@ export default function ProjectsTable({ proyectos, loading }: Props) {
               {proyecto.fecha_fin ? formatearFecha(proyecto.fecha_fin) : "-"}
             </div>
             <div className="text-sm mb-1">
-              <strong>Provincia:</strong> {proyecto.provincia}
+              <strong>Cliente:</strong> {proyecto.cliente_nombre} {proyecto.cliente_apellido}
             </div>
             <div className="text-sm mb-1">
-              <strong>Localidad:</strong> {proyecto.localidad}
-            </div>
-            <div className="text-sm mb-1">
-              <strong>Calle:</strong> {proyecto.calle}
+              <strong>Ubicación:</strong> {proyecto.calle}, {proyecto.localidad}, {proyecto.provincia}
             </div>
             <div className="flex gap-4 justify-end">
               <button

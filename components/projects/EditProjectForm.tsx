@@ -12,7 +12,7 @@ import { Proyecto } from "@/models/Project";
 import Provincia from "@/models/Provincia";
 import Localidad from "@/models/Localidad";
 import { TypeProject } from "@/models/TypeProject";
-import ProjectFormFields from "./ProjectFormFields"; // ⚠️ Reutilizá los campos que ya tenés
+import ProjectFormFields from "./ProjectFormFields"; 
 import { Button } from "../ui/button";
 import { Form } from "../ui/form";
 import Cliente from "@/models/Cliente";
