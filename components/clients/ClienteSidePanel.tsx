@@ -1,7 +1,7 @@
 "use client"
 
 import { useForm, FormProvider } from "react-hook-form"
-import { useEffect, useMemo, useState } from "react"
+import { use, useEffect, useMemo, useState } from "react"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -31,6 +31,8 @@ import {
   CommandList
 } from "../ui/command"
 import { cn } from "@/lib/utils"
+import { Proyecto } from "@/models/Project"
+import router from "next/router"
 
 type Props = {
   cliente: Cliente,
@@ -43,7 +45,9 @@ export default function ClienteSidePanel({ cliente, onClose, onCloseAndSearch, m
   const [provincias, setProvincias] = useState<Provincia[]>([]);
   const [localidades, setLocalidades] = useState<Localidad[]>([]);
   const [localidadCliente, setLocalidadToForm] = useState<Localidad>();
-  const [provinciaCliente, setProvinciaToForm] = useState<Provincia>()
+  const [provinciaCliente, setProvinciaToForm] = useState<Provincia>();
+  const [proyectosVinculados, setProyectosVinculados] = useState<Proyecto[]>([]);
+
 
   const form = useForm({
     defaultValues: {
@@ -108,7 +112,27 @@ export default function ClienteSidePanel({ cliente, onClose, onCloseAndSearch, m
         form.setValue("localidad", localidadCliente.nombre)
       }
     }
-  }, [localidades, cliente.id_localidad])
+  }, [localidades, cliente.id_localidad]);
+
+  // Buscar proyectos vinculados al cliente
+  useEffect(() => {
+    const fetchProyectosVinculados = async () => {
+      if (cliente.id) {
+        const { data, error } = await supabase
+          .from("proyecto_detalle_view")
+          .select("*")
+          .eq("id_cliente", cliente.id)
+
+        if (!error && data) {
+          setProyectosVinculados(data)
+        } else {
+          toast.error("Error al cargar los proyectos vinculados.")
+        }
+      }
+    }
+
+    fetchProyectosVinculados()
+  }, [cliente.id]);
 
   async function fetchLocalidades(idProvincia: string) {
     const { data, error } = await supabase
@@ -125,6 +149,16 @@ export default function ClienteSidePanel({ cliente, onClose, onCloseAndSearch, m
       setLocalidades(locs)
     }
   }
+
+  useEffect(() => {
+    if (cliente.id) {
+      form.setValue("nombre", cliente.nombre)
+      form.setValue("apellido", cliente.apellido)
+      form.setValue("email", cliente.email)
+      form.setValue("telefono", cliente.telefono)
+      form.setValue("calle", cliente.calle)
+    }
+  }, [cliente])
 
   const onSubmit = async (values: any) => {
     const idProvincia = provincias.find(p => p.nombre === values.provincia)?.id
@@ -195,7 +229,7 @@ export default function ClienteSidePanel({ cliente, onClose, onCloseAndSearch, m
               {mostrarTabProyectos && (
                 <TabsTrigger value="proyectos">Proyectos vinculados</TabsTrigger>
               )}
-              
+
             </TabsList>
 
             <TabsContent value="datos" className="space-y-4">
@@ -389,9 +423,45 @@ export default function ClienteSidePanel({ cliente, onClose, onCloseAndSearch, m
             </TabsContent>
 
             <TabsContent value="proyectos">
-              <p className="text-sm text-muted-foreground">
-                Acá irán los proyectos asociados
-              </p>
+
+              {proyectosVinculados.length === 0 ? (
+                <div className="p-4 text-center text-gray-500">No hay proyectos vinculados.</div>
+              ) : (
+                <div className="flex flex-col gap-4">
+                  {proyectosVinculados.map((proyecto) => (
+                    <div
+                      key={proyecto.id}
+                      className="border rounded-md p-4 shadow-sm bg-white"
+                    >
+                      <div className="font-semibold text-lg mb-1">{proyecto.nombre}</div>
+                      <div className="text-sm text-gray-600 mb-2 flex items-center gap-1">
+                        <span>{proyecto.icono_tipo}</span>
+                        <span>{proyecto.tipo}</span>
+                      </div>
+
+                      <div className="text-sm mb-1">
+                        <strong>Estado:</strong>{" "}
+                        <EstadoProyectoTag estado={proyecto.estado} color={proyecto.color_estado} />
+                      </div>
+                      <div className="text-sm mb-1">
+                        <strong>Inicio:</strong> {formatearFecha(proyecto.fecha_inicio)}
+                      </div>
+                      <div className="text-sm mb-1">
+                        <strong>Fin:</strong>{" "}
+                        {proyecto.fecha_fin ? formatearFecha(proyecto.fecha_fin) : "-"}
+                      </div>
+                      <div className="text-sm mb-1">
+                        <strong>Cliente:</strong> {proyecto.cliente_nombre} {proyecto.cliente_apellido}
+                      </div>
+                      <div className="text-sm mb-1">
+                        <strong>Ubicación:</strong> {proyecto.calle}, {proyecto.localidad}, {proyecto.provincia}
+                      </div>
+                      <div className="flex gap-4 justify-end">                        
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
             </TabsContent>
           </Tabs>
         </div>
@@ -403,4 +473,17 @@ export default function ClienteSidePanel({ cliente, onClose, onCloseAndSearch, m
       </div>
     </Form>
   )
+}
+
+function formatearFecha(fecha: string) {
+  const f = new Date(fecha);
+  return `${f.getDate()}/${f.getMonth() + 1}/${f.getFullYear()}`;
+}
+
+function EstadoProyectoTag({ estado, color }: { estado?: string; color?: string }) {
+  return (
+    <span className={`text-xs px-2 py-0.5 rounded-full bg-black text-white`}>
+      {estado}
+    </span>
+  );
 }
