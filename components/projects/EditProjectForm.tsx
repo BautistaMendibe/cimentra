@@ -12,7 +12,7 @@ import { Proyecto } from "@/models/Project";
 import Provincia from "@/models/Provincia";
 import Localidad from "@/models/Localidad";
 import { TypeProject } from "@/models/TypeProject";
-import ProjectFormFields from "./ProjectFormFields"; 
+import ProjectFormFields from "./ProjectFormFields";
 import { Button } from "../ui/button";
 import { Form } from "../ui/form";
 import Cliente from "@/models/Cliente";
@@ -39,6 +39,8 @@ export default function EditProjectForm() {
     const [localidades, setLocalidades] = useState<Localidad[]>([]);
     const [clientes, setClientes] = useState<Cliente[]>([]);
     const [initialValues, setInitialValues] = useState<z.infer<typeof formSchema> | null>(null);
+    const [clienteActual, setClienteActual] = useState<Cliente>({} as Cliente);
+    const [mostrarPanelCliente, setMostrarPanelCliente] = useState(false);
 
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
@@ -71,12 +73,12 @@ export default function EditProjectForm() {
             { data: tipos },
             { data: provs },
             { data: clientesData }
-          ] = await Promise.all([
+        ] = await Promise.all([
             supabase.from("proyecto_detalle_view").select("*").eq("id", id).single(),
             supabase.from("tipos_proyecto").select("*"),
             supabase.from("provincias").select("*"),
             supabase.from("cliente").select("*"),
-          ]);
+        ]);
 
         if (!proyecto || !tipos || !provs || !clientesData) {
             toast.error("Error al cargar datos del proyecto");
@@ -163,6 +165,10 @@ export default function EditProjectForm() {
                         localidades={localidades}
                         projectTypes={projectTypes}
                         clientes={clientes}
+                        onNuevoCliente={() => {
+                            setClienteActual({} as Cliente);
+                            setMostrarPanelCliente(true);
+                        }}
                     />
 
                     <div className="flex gap-4 justify-between">
