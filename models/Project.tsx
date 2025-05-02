@@ -1,3 +1,6 @@
+import Cliente from "./Cliente";
+import Provincia from "./Provincia";
+
 export interface Proyecto {
   id: number;
   nombre: string;
@@ -12,6 +15,8 @@ export interface Proyecto {
   id_localidad: number;
   calle: string;
   id_cliente: string;
+  cliente: Cliente;
+
 
   // Campos relacionados opcionales (para mostrar)
   provincia?: string;
